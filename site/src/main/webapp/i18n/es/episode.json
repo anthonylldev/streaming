@@ -1,0 +1,27 @@
+{
+  "streamingApp": {
+    "episode": {
+      "home": {
+        "title": "Episodes",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Episode",
+        "createOrEditLabel": "Crear o editar Episode",
+        "notFound": "Ningún Episodes encontrado"
+      },
+      "created": "Un nuevo Episode ha sido creado con el identificador {{ param }}",
+      "updated": "Un Episode ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Episode ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Episode {{ id }}?"
+      },
+      "detail": {
+        "title": "Episode"
+      },
+      "id": "ID",
+      "title": "Title",
+      "synopsis": "Synopsis",
+      "order": "Order",
+      "film": "Film"
+    }
+  }
+}

@@ -1,0 +1,76 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <div *ngIf="film">
+      <h2 data-cy="filmDetailsHeading"><span jhiTranslate="streamingApp.film.detail.title">Film</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dd>
+          <span>{{ film.id }}</span>
+        </dd>
+        <dt><span jhiTranslate="streamingApp.film.title">Title</span></dt>
+        <dd>
+          <span>{{ film.title }}</span>
+        </dd>
+        <dt><span jhiTranslate="streamingApp.film.synopsis">Synopsis</span></dt>
+        <dd>
+          <span>{{ film.synopsis }}</span>
+        </dd>
+        <dt><span jhiTranslate="streamingApp.film.views">Views</span></dt>
+        <dd>
+          <span>{{ film.views }}</span>
+        </dd>
+        <dt><span jhiTranslate="streamingApp.film.cover">Cover</span></dt>
+        <dd>
+          <div *ngIf="film.cover">
+            <a (click)="openFile(film.cover, film.coverContentType)">
+              <img [src]="'data:' + film.coverContentType + ';base64,' + film.cover" style="max-width: 100%" alt="film image" />
+            </a>
+            {{ film.coverContentType }}, {{ byteSize(film.cover) }}
+          </div>
+        </dd>
+        <dt><span jhiTranslate="streamingApp.film.reviews">Reviews</span></dt>
+        <dd>
+          <span>{{ film.reviews }}</span>
+        </dd>
+        <dt><span jhiTranslate="streamingApp.film.gender">Gender</span></dt>
+        <dd>
+          <span jhiTranslate="{{ 'streamingApp.Gender.' + film.gender }}">{{ film.gender }}</span>
+        </dd>
+        <dt><span jhiTranslate="streamingApp.film.filmType">Film Type</span></dt>
+        <dd>
+          <span jhiTranslate="{{ 'streamingApp.FilmType.' + film.filmType }}">{{ film.filmType }}</span>
+        </dd>
+        <dt><span jhiTranslate="streamingApp.film.order">Order</span></dt>
+        <dd>
+          <span>{{ film.order }}</span>
+        </dd>
+        <dt><span jhiTranslate="streamingApp.film.url">Url</span></dt>
+        <dd>
+          <span>{{ film.url }}</span>
+        </dd>
+        <dt><span jhiTranslate="streamingApp.film.person">Person</span></dt>
+        <dd>
+          <span *ngFor="let person of film.people; let last = last">
+            <a [routerLink]="['/person', person.id, 'view']">{{ person.id }}</a
+            >{{ last ? '' : ', ' }}
+          </span>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Volver</span>
+      </button>
+
+      <button type="button" [routerLink]="['/film', film.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+      </button>
+    </div>
+  </div>
+</div>
