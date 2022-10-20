@@ -125,5 +125,8 @@
 </div>
 
 <div *jhiHasAnyAuthority="'ROLE_USER'">
-  <jhi-person-card *ngFor="let person of people"></jhi-person-card>
+  <h2 jhiTranslate="streamingApp.person.home.distribution">Reparto</h2>
+  <div class="row">
+    <jhi-person-card class="col-12 col-md-2" *ngFor="let person of people" [person]="person"></jhi-person-card>
+  </div>
 </div>
