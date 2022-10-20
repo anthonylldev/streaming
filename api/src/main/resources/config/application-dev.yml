@@ -39,6 +39,9 @@ spring:
       poolName: Hikari
       auto-commit: false
   jpa:
+    properties:
+      hibernate:
+        format_sql: true
     database-platform: tech.jhipster.domain.util.FixedPostgreSQL10Dialect
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
