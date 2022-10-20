@@ -1,0 +1,10 @@
+{
+  "streamingApp": {
+    "FilmType": {
+      "null": "",
+      "MOVIE": "MOVIE",
+      "DOCUMENTARY": "DOCUMENTARY",
+      "SERIE": "SERIE"
+    }
+  }
+}

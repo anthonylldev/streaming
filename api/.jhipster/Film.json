@@ -1,0 +1,76 @@
+{
+  "applications": "*",
+  "changelogDate": "20221019153444",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "film",
+  "fields": [
+    {
+      "fieldName": "title",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "minlength"],
+      "fieldValidateRulesMinlength": "3"
+    },
+    {
+      "fieldName": "synopsis",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "views",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["min"],
+      "fieldValidateRulesMin": "0"
+    },
+    {
+      "fieldName": "cover",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "image"
+    },
+    {
+      "fieldName": "reviews",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "gender",
+      "fieldType": "Gender",
+      "fieldValues": "COMEDY,DRAMA,ADVENTURE,ACTION,CRIME,THRILLER,ROMANCE,DOCUMENTARY,ANIMATED,FANTASY,MUSICALS,SCIFI,HORROR"
+    },
+    {
+      "fieldName": "filmType",
+      "fieldType": "FilmType",
+      "fieldValues": "MOVIE,DOCUMENTARY,SERIE"
+    },
+    {
+      "fieldName": "order",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["min"],
+      "fieldValidateRulesMin": "0"
+    },
+    {
+      "fieldName": "url",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": true,
+  "name": "Film",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "person",
+      "otherEntityRelationshipName": "film",
+      "ownerSide": true,
+      "relationshipName": "person",
+      "relationshipType": "many-to-many"
+    },
+    {
+      "otherEntityName": "episode",
+      "otherEntityRelationshipName": "film",
+      "relationshipName": "episodes",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "serviceImpl"
+}

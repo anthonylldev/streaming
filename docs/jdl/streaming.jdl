@@ -1,0 +1,58 @@
+
+entity Film {
+	title String required minlength(3)
+    synopsis String
+    views Integer min(0)
+    cover ImageBlob
+    reviews Long
+    gender Gender
+    filmType FilmType
+    order Integer min(0)
+    url String required
+}
+
+entity Episode {
+	title String required minlength(3)
+    synopsis String
+    order Integer
+}
+
+entity Person {
+	name String required minlength(3)
+    cover ImageBlob
+}
+
+enum Gender {
+	COMEDY
+    DRAMA
+    ADVENTURE
+    ACTION
+    CRIME
+    THRILLER
+    ROMANCE
+    DOCUMENTARY
+    ANIMATED
+    FANTASY
+    MUSICALS
+    SCIFI
+    HORROR
+}
+
+enum FilmType {
+	MOVIE
+    DOCUMENTARY
+    SERIE
+}
+
+relationship ManyToOne {
+	Episode{film(title)} to Film{episodes}
+}
+
+relationship ManyToMany {
+	Film{person} to Person{film}
+}
+
+service all with serviceImpl
+dto all with mapstruct
+paginate all with pagination
+filter all

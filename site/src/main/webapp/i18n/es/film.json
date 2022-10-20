@@ -1,0 +1,34 @@
+{
+  "streamingApp": {
+    "film": {
+      "home": {
+        "title": "Films",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Film",
+        "createOrEditLabel": "Crear o editar Film",
+        "notFound": "Ningún Films encontrado"
+      },
+      "created": "Un nuevo Film ha sido creado con el identificador {{ param }}",
+      "updated": "Un Film ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Film ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Film {{ id }}?"
+      },
+      "detail": {
+        "title": "Film"
+      },
+      "id": "ID",
+      "title": "Title",
+      "synopsis": "Synopsis",
+      "views": "Views",
+      "cover": "Cover",
+      "reviews": "Reviews",
+      "gender": "Gender",
+      "filmType": "Film Type",
+      "order": "Order",
+      "url": "Url",
+      "person": "Person",
+      "episodes": "Episodes"
+    }
+  }
+}

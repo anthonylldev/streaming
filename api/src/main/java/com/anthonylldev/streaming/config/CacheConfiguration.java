@@ -48,6 +48,12 @@ public class CacheConfiguration {
             createCache(cm, com.anthonylldev.streaming.domain.User.class.getName());
             createCache(cm, com.anthonylldev.streaming.domain.Authority.class.getName());
             createCache(cm, com.anthonylldev.streaming.domain.User.class.getName() + ".authorities");
+            createCache(cm, com.anthonylldev.streaming.domain.Film.class.getName());
+            createCache(cm, com.anthonylldev.streaming.domain.Film.class.getName() + ".people");
+            createCache(cm, com.anthonylldev.streaming.domain.Film.class.getName() + ".episodes");
+            createCache(cm, com.anthonylldev.streaming.domain.Episode.class.getName());
+            createCache(cm, com.anthonylldev.streaming.domain.Person.class.getName());
+            createCache(cm, com.anthonylldev.streaming.domain.Person.class.getName() + ".films");
             // jhipster-needle-ehcache-add-entry
         };
     }

@@ -1,0 +1,90 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-person-heading" data-cy="PersonCreateUpdateHeading" jhiTranslate="streamingApp.person.home.createOrEditLabel">
+        Crear o editar Person
+      </h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        <div class="row mb-3" *ngIf="editForm.controls.id.value !== null">
+          <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="streamingApp.person.name" for="field_name">Name</label>
+          <input type="text" class="form-control" name="name" id="field_name" data-cy="name" formControlName="name" />
+          <div *ngIf="editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)">
+            <small class="form-text text-danger" *ngIf="editForm.get('name')?.errors?.required" jhiTranslate="entity.validation.required">
+              Este campo es obligatorio.
+            </small>
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('name')?.errors?.minlength"
+              jhiTranslate="entity.validation.minlength"
+              [translateValues]="{ min: 3 }"
+            >
+              Este campo requiere al menos 3 caracteres.
+            </small>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="streamingApp.person.cover" for="field_cover">Cover</label>
+          <div>
+            <img
+              [src]="'data:' + editForm.get('coverContentType')!.value + ';base64,' + editForm.get('cover')!.value"
+              style="max-height: 100px"
+              *ngIf="editForm.get('cover')!.value"
+              alt="person image"
+            />
+            <div *ngIf="editForm.get('cover')!.value" class="form-text text-danger clearfix">
+              <span class="pull-start">{{ editForm.get('coverContentType')!.value }}, {{ byteSize(editForm.get('cover')!.value!) }}</span>
+              <button
+                type="button"
+                (click)="clearInputImage('cover', 'coverContentType', 'file_cover')"
+                class="btn btn-secondary btn-xs pull-end"
+              >
+                <fa-icon icon="times"></fa-icon>
+              </button>
+            </div>
+            <input
+              type="file"
+              id="file_cover"
+              data-cy="cover"
+              (change)="setFileData($event, 'cover', true)"
+              accept="image/*"
+              jhiTranslate="entity.action.addimage"
+            />
+          </div>
+          <input type="hidden" class="form-control" name="cover" id="field_cover" data-cy="cover" formControlName="cover" />
+          <input
+            type="hidden"
+            class="form-control"
+            name="coverContentType"
+            id="field_coverContentType"
+            formControlName="coverContentType"
+          />
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancelar</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Guardar</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
