@@ -13,16 +13,34 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring")
 public interface FilmMapper extends EntityMapper<FilmDTO, Film> {
-    @Mapping(target = "people", source = "people", qualifiedByName = "personIdSet")
-    FilmDTO toDto(Film s);
 
     @Mapping(target = "removePerson", ignore = true)
+    @Mapping(target = "episodes", ignore = true)
+    @Mapping(target = "removeEpisodes", ignore = true)
+    @Mapping(target = "people", source = "people", qualifiedByName = "personEntityId")
     Film toEntity(FilmDTO filmDTO);
+
+    @Override
+    @Mapping(target = "removePerson", ignore = true)
+    @Mapping(target = "episodes", ignore = true)
+    @Mapping(target = "removeEpisodes", ignore = true)
+    @Mapping(target = "people", source = "people", qualifiedByName = "personEntityId")
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void partialUpdate(@MappingTarget Film entity, FilmDTO dto);
+
+    @Mapping(target = "people", source = "people", qualifiedByName = "personIdSet")
+    FilmDTO toDto(Film s);
 
     @Named("personId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
     PersonDTO toDtoPersonId(Person person);
+
+    @Named("personEntityId")
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    Person toDtoPersonId(PersonDTO personDTO);
 
     @Named("personIdSet")
     default Set<PersonDTO> toDtoPersonIdSet(Set<Person> person) {
