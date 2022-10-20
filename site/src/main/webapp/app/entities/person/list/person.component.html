@@ -1,4 +1,4 @@
-<div>
+<div *jhiHasAnyAuthority="'ROLE_ADMIN'">
   <h2 id="page-heading" data-cy="PersonHeading">
     <span jhiTranslate="streamingApp.person.home.title">People</span>
 
@@ -122,4 +122,8 @@
       ></ngb-pagination>
     </div>
   </div>
+</div>
+
+<div *jhiHasAnyAuthority="'ROLE_USER'">
+  <jhi-person-card *ngFor="let person of people"></jhi-person-card>
 </div>
