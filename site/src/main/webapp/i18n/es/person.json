@@ -4,19 +4,22 @@
       "home": {
         "title": "People",
         "refreshListLabel": "Refrescar lista",
-        "createLabel": "Crear nuevo Person",
-        "createOrEditLabel": "Crear o editar Person",
-        "notFound": "Ningún People encontrado",
+        "createLabel": "Crear nueva Persona",
+        "createOrEditLabel": "Crear o editar Persona",
+        "notFound": "Ningúnas Personas encontradas",
         "distribution": "Reparto"
       },
-      "created": "Un nuevo Person ha sido creado con el identificador {{ param }}",
-      "updated": "Un Person ha sido actualizado con el identificador {{ param }}",
-      "deleted": "Un Person ha sido eliminado con el identificador {{ param }}",
+      "created": "Una nueva Persona ha sido creada con el identificador {{ param }}",
+      "updated": "Una Persona ha sido actualizada con el identificador {{ param }}",
+      "deleted": "Una Persona ha sido eliminada con el identificador {{ param }}",
       "delete": {
-        "question": "¿Seguro que quiere eliminar Person {{ id }}?"
+        "question": "¿Seguro que quiere eliminar a {{ name }} con id: {{ id }}?",
+        "selected": {
+          "question": "¿Seguro que quiere eliminar a las personas seleccionadas?"
+        }
       },
       "detail": {
-        "title": "Person"
+        "title": "Persona"
       },
       "id": "ID",
       "name": "Name",
