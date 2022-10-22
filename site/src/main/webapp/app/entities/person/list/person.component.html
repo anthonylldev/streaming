@@ -34,7 +34,7 @@
           <h5 class="m-0">Manage People</h5>
           <span class="p-input-icon-left">
             <i class="pi pi-search"></i>
-            <input pInputText type="text" placeholder="Search..." />
+            <input pInputText type="text" placeholder="Search..." (ngModelChange)="search($event)" [(ngModel)]="searchText"/>
           </span>
         </div>
       </ng-template>

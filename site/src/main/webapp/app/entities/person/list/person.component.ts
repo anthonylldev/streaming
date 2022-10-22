@@ -31,6 +31,8 @@ export class PersonComponent implements OnInit {
   totalItems = 0;
   page = 1;
 
+  searchText?: string;
+
   constructor(
     protected personService: PersonService,
     protected activatedRoute: ActivatedRoute,
@@ -38,6 +40,18 @@ export class PersonComponent implements OnInit {
     protected dataUtils: DataUtils,
     protected modalService: NgbModal
   ) {}
+
+
+  search($event: string): void {
+    if ($event.length >= 3) {
+      this.filters.clear();
+      this.filters.addFilter("name.contains", ...[$event]);
+    }
+
+    if ($event.length < 3) {
+      this.filters.clear();
+    }
+  }
 
   trackId = (_index: number, item: IPerson): number => this.personService.getPersonIdentifier(item);
 
