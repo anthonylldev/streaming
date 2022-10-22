@@ -243,3 +243,23 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   background-color: #000 !important;
 }
 /* jhipster-needle-scss-add-main JHipster will add new css style */
+ngb-pagination  {
+  .page-item {
+    .page-link {
+      background-color: black;
+      border: none;
+      color: white;
+      font-size: 1.1em;
+
+      box-shadow: 0 0 10px black;
+    }
+  }
+
+  .page-item.active {
+    .page-link {
+      background-color: white;
+      border: none;
+      color: black;
+    }
+  }
+}
