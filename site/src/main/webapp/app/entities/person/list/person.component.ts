@@ -16,9 +16,12 @@ import { FilterOptions, IFilterOptions, IFilterOption } from 'app/shared/filter/
 @Component({
   selector: 'jhi-person',
   templateUrl: './person.component.html',
+  styleUrls: ["./person.component.scss"]
 })
 export class PersonComponent implements OnInit {
   people?: IPerson[];
+  selectedPeople?: IPerson[];
+  person?: IPerson;
   isLoading = false;
 
   predicate = 'id';
@@ -29,6 +32,8 @@ export class PersonComponent implements OnInit {
   totalItems = 0;
   page = 1;
 
+  searchText?: string;
+
   constructor(
     protected personService: PersonService,
     protected activatedRoute: ActivatedRoute,
@@ -36,6 +41,18 @@ export class PersonComponent implements OnInit {
     protected dataUtils: DataUtils,
     protected modalService: NgbModal
   ) {}
+
+
+  search($event: string): void {
+    if ($event.length >= 3) {
+      this.filters.clear();
+      this.filters.addFilter("name.contains", ...[$event]);
+    }
+
+    if ($event.length < 3) {
+      this.filters.clear();
+    }
+  }
 
   trackId = (_index: number, item: IPerson): number => this.personService.getPersonIdentifier(item);
 
@@ -55,7 +72,11 @@ export class PersonComponent implements OnInit {
 
   delete(person: IPerson): void {
     const modalRef = this.modalService.open(PersonDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.person = person;
+
+    // ?The person is wrapped in a list
+    const personAux: IPerson[] = [person]
+
+    modalRef.componentInstance.person = personAux;
     // unsubscribe not needed because closed completes on modal close
     modalRef.closed
       .pipe(
@@ -67,6 +88,26 @@ export class PersonComponent implements OnInit {
           this.onResponseSuccess(res);
         },
       });
+  }
+
+  deleteSelectedPeople(): void {
+    if (this.selectedPeople?.length === 1) {
+      this.delete(this.selectedPeople[0])
+    } else {
+      const modalRef = this.modalService.open(PersonDeleteDialogComponent, { size: 'lg', backdrop: 'static'});
+    modalRef.componentInstance.person = this.selectedPeople;
+    // unsubscribe not needed because closed completes on modal close
+    modalRef.closed
+      .pipe(
+        filter(reason => reason === ITEM_DELETED_EVENT),
+        switchMap(() => this.loadFromBackendWithRouteInformations())
+      )
+      .subscribe({
+        next: (res: EntityArrayResponseType) => {
+          this.onResponseSuccess(res);
+        },
+      });
+    }
   }
 
   load(): void {

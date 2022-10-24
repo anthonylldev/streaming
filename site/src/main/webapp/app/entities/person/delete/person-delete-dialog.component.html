@@ -1,14 +1,17 @@
-<form *ngIf="person" name="deleteForm" (ngSubmit)="confirmDelete(person.id!)">
+<form *ngIf="person" name="deleteForm" (ngSubmit)="confirmDelete(person!)" class="text-dark">
   <div class="modal-header">
     <h4 class="modal-title" data-cy="personDeleteDialogHeading" jhiTranslate="entity.delete.title">Confirmar operación de borrado</h4>
 
-    <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="cancel()">&times;</button>
+    <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="cancel()"></button>
   </div>
 
   <div class="modal-body">
     <jhi-alert-error></jhi-alert-error>
-    <p id="jhi-delete-person-heading" jhiTranslate="streamingApp.person.delete.question" [translateValues]="{ id: person.id }">
-      ¿Seguro que quiere eliminar Person {{ person.id }}?
+    <p *ngIf="person.length == 1" id="jhi-delete-person-heading" jhiTranslate="streamingApp.person.delete.question" [translateValues]="{ id: person[0].id, name: person[0].name }">
+      ¿Seguro que quiere eliminar a {{ person[0].name }} con id: {{ person[0].id }}?
+    </p>
+    <p *ngIf="person.length > 1" id="jhi-delete-person-heading" jhiTranslate="streamingApp.person.delete.selected.question" [translateValues]="{ id: person[0].id, name: person[0].name }">
+      ¿Seguro que quiere eliminar a {{ person[0].name }} con id: {{ person[0].id }}?
     </p>
   </div>
 

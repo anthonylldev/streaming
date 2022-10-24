@@ -9,7 +9,7 @@
 // Grayscale and brand colors for use across Bootstrap.
 
 $primary: #3e8acc;
-$success: #28a745;
+$success: #22c55e;
 $info: #17a2b8;
 $warning: #ffc107;
 $danger: #dc3545;
@@ -34,7 +34,8 @@ $border-radius-sm: 0.1rem;
 // Body:
 // Settings for the `<body>` element.
 
-$body-bg: #e4e5e6;
+$body-bg: #1d1d1d;
+$body-color: white;
 
 // Typography:
 // Font, line-height, and color for body text, headings, and more.
@@ -43,3 +44,10 @@ $font-size-base: 1rem;
 
 $dropdown-link-hover-color: white;
 $dropdown-link-hover-bg: #343a40;
+
+$xs: 0;
+$sm: 576px;
+$md: 768px;
+$lg: 992px;
+$xl: 1200px;
+$xxl: 1400px;

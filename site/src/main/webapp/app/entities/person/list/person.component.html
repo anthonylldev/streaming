@@ -1,115 +1,99 @@
-<div>
-  <h2 id="page-heading" data-cy="PersonHeading">
-    <span jhiTranslate="streamingApp.person.home.title">People</span>
+<div *jhiHasAnyAuthority="'ROLE_ADMIN'">
+  <div class="container">
+    <p-toolbar styleClass="mb-4">
+      <ng-template pTemplate="left">
+        <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2" [routerLink]="['/person/new']"></button>
+        <button
+          pButton
+          pRipple
+          label="Delete"
+          icon="pi pi-trash"
+          class="p-button-danger"
+          (click)="deleteSelectedPeople()"
+          [disabled]="!selectedPeople || !selectedPeople.length"
+        ></button>
+      </ng-template>
 
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
-        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
-        <span jhiTranslate="streamingApp.person.home.refreshListLabel">Refrescar lista</span>
-      </button>
+      <ng-template pTemplate="right">
+        <button pButton pRipple label="Export" icon="pi pi-upload" class="p-button-help"></button>
+      </ng-template>
+    </p-toolbar>
 
-      <button
-        id="jh-create-entity"
-        data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-person"
-        [routerLink]="['/person/new']"
-      >
-        <fa-icon icon="plus"></fa-icon>
-        <span jhiTranslate="streamingApp.person.home.createLabel"> Crear nuevo Person </span>
-      </button>
-    </div>
-  </h2>
-
-  <jhi-alert-error></jhi-alert-error>
-
-  <jhi-alert></jhi-alert>
-
-  <jhi-filter [filters]="filters"></jhi-filter>
-
-  <div class="alert alert-warning" id="no-result" *ngIf="people?.length === 0">
-    <span jhiTranslate="streamingApp.person.home.notFound">Ningún People encontrado</span>
-  </div>
-
-  <div class="table-responsive table-entities" id="entities" *ngIf="people && people.length > 0">
-    <table class="table table-striped" aria-describedby="page-heading">
-      <thead>
-        <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="navigateToWithComponentValues()">
-          <th scope="col" jhiSortBy="id">
-            <div class="d-flex">
-              <span jhiTranslate="global.field.id">ID</span>
-              <fa-icon class="p-1" icon="sort"></fa-icon>
-            </div>
+    <p-table
+      *ngIf="people"
+      #dt
+      [value]="people"
+      [globalFilterFields]="['name']"
+      responsiveLayout="scroll"
+      [(selection)]="selectedPeople"
+      [rowHover]="true"
+      dataKey="id"
+    >
+      <ng-template pTemplate="caption">
+        <div class="flex align-items-center justify-content-between">
+          <h5 class="m-0">Manage People</h5>
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input pInputText type="text" placeholder="Search..." (ngModelChange)="search($event)" [(ngModel)]="searchText"/>
+          </span>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 3rem">
+            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
           </th>
-          <th scope="col" jhiSortBy="name">
-            <div class="d-flex">
-              <span jhiTranslate="streamingApp.person.name">Name</span>
-              <fa-icon class="p-1" icon="sort"></fa-icon>
-            </div>
-          </th>
-          <th scope="col" jhiSortBy="cover">
-            <div class="d-flex">
-              <span jhiTranslate="streamingApp.person.cover">Cover</span>
-              <fa-icon class="p-1" icon="sort"></fa-icon>
-            </div>
-          </th>
-          <th scope="col"></th>
+          <th>Image</th>
+          <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
+          <th></th>
         </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let person of people; trackBy: trackId" data-cy="entityTable">
+      </ng-template>
+      <ng-template pTemplate="body" let-person>
+        <tr>
           <td>
-            <a [routerLink]="['/person', person.id, 'view']">{{ person.id }}</a>
+            <p-tableCheckbox [value]="person"></p-tableCheckbox>
+          </td>
+          <td>
+            <img [src]="'data:' + person.coverContentType + ';base64,' + person.cover" [alt]="person.name" width="100" class="shadow-4" />
           </td>
           <td>{{ person.name }}</td>
           <td>
-            <a *ngIf="person.cover" (click)="openFile(person.cover, person.coverContentType)">
-              <img [src]="'data:' + person.coverContentType + ';base64,' + person.cover" style="max-height: 30px" alt="person image" />
-            </a>
-            <span *ngIf="person.cover">{{ person.coverContentType }}, {{ byteSize(person.cover) }}</span>
-          </td>
-          <td class="text-end">
-            <div class="btn-group">
-              <button
-                type="submit"
-                [routerLink]="['/film']"
-                [queryParams]="{ 'filter[personId.in]': person.id }"
-                class="btn btn-info btn-sm"
-                data-cy="filterOtherEntityButton"
-              >
-                <fa-icon icon="eye"></fa-icon>
-                <span
-                  class="d-none d-md-inline"
-                  jhiTranslate="entity.action.show"
-                  [translateValues]="{ otherEntity: ('streamingApp.person.film' | translate) }"
-                  >Show Film</span
-                >
-              </button>
-              <button type="submit" [routerLink]="['/person', person.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                <fa-icon icon="eye"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Vista</span>
-              </button>
-
-              <button type="submit" [routerLink]="['/person', person.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                <fa-icon icon="pencil-alt"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editar</span>
-              </button>
-
-              <button type="submit" (click)="delete(person)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                <fa-icon icon="times"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Eliminar</span>
-              </button>
-            </div>
+            <button
+              pButton
+              pRipple
+              icon="pi pi-pencil"
+              class="p-button-rounded p-button-success mr-2"
+              [routerLink]="['/person', person.id, 'edit']"
+            ></button>
+            <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="delete(person)"></button>
           </td>
         </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div *ngIf="people && people.length > 0">
-    <div class="d-flex justify-content-center">
-      <jhi-item-count [params]="{ page: page, totalItems: totalItems, itemsPerPage: itemsPerPage }"></jhi-item-count>
+      </ng-template>
+    </p-table>
+    <br />
+    <div *ngIf="people && people.length > 0">
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems"
+          [page]="page"
+          [pageSize]="itemsPerPage"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        ></ngb-pagination>
+      </div>
     </div>
+  </div>
+</div>
 
+<div *jhiHasAnyAuthority="'ROLE_USER'">
+  <h2><span jhiTranslate="streamingApp.person.home.distribution">Reparto</span></h2>
+  <div class="row">
+    <jhi-person-card class="col-sm-12 col-md-6 col-lg-3 col-xl-2" *ngFor="let person of people" [person]="person"></jhi-person-card>
+  </div>
+  <br />
+  <div *ngIf="people && people.length > 0">
     <div class="d-flex justify-content-center">
       <ngb-pagination
         [collectionSize]="totalItems"

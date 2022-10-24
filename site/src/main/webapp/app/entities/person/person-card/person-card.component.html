@@ -1,0 +1,6 @@
+<div *ngIf="person" class="person-card-container">
+  <div class="image-container">
+    <img [src]="'data:' + person.coverContentType + ';base64,' + person.cover" class="img-fluid" alt="person image"/>
+  </div>
+  <p>{{ person.name }}</p>
+</div>
