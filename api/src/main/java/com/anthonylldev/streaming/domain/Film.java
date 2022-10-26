@@ -4,6 +4,7 @@ import com.anthonylldev.streaming.domain.enumeration.FilmType;
 import com.anthonylldev.streaming.domain.enumeration.Gender;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
@@ -65,6 +66,14 @@ public class Film implements Serializable {
     @NotNull
     @Column(name = "url", nullable = false)
     private String url;
+
+    @NotNull
+    @Column(name = "publication_date", nullable = false)
+    private LocalDateTime publicationDate;
+
+    @NotNull
+    @Column(name = "inclusion_date", nullable = false)
+    private LocalDateTime inclusionDate;
 
     @ManyToMany
     @JoinTable(name = "rel_film__person", joinColumns = @JoinColumn(name = "film_id"), inverseJoinColumns = @JoinColumn(name = "person_id"))
@@ -222,6 +231,32 @@ public class Film implements Serializable {
         this.url = url;
     }
 
+    public LocalDateTime getPublicationDate() {
+        return publicationDate;
+    }
+
+    public Film publicationDate(LocalDateTime publicationDate) {
+        this.setPublicationDate(publicationDate);
+        return this;
+    }
+
+    public void setPublicationDate(LocalDateTime publicationDate) {
+        this.publicationDate = publicationDate;
+    }
+
+    public LocalDateTime getInclusionDate() {
+        return inclusionDate;
+    }
+
+    public Film inclusionDate(LocalDateTime inclusionDate) {
+        this.setInclusionDate(inclusionDate);
+        return this;
+    }
+
+    public void setInclusionDate(LocalDateTime inclusionDate) {
+        this.inclusionDate = inclusionDate;
+    }
+
     public Set<Person> getPeople() {
         return this.people;
     }
@@ -312,6 +347,8 @@ public class Film implements Serializable {
             ", filmType='" + getFilmType() + "'" +
             ", order=" + getOrder() +
             ", url='" + getUrl() + "'" +
+            ", publicationDate='" + getPublicationDate() + "'" +
+            ", inclusionDate='" + getInclusionDate() + "'" +
             "}";
     }
 }

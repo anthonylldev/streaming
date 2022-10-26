@@ -3,6 +3,7 @@ package com.anthonylldev.streaming.service.dto;
 import com.anthonylldev.streaming.domain.enumeration.FilmType;
 import com.anthonylldev.streaming.domain.enumeration.Gender;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -41,6 +42,12 @@ public class FilmDTO implements Serializable {
 
     @NotNull
     private String url;
+
+    @NotNull
+    private LocalDateTime publicationDate;
+
+    @NotNull
+    private LocalDateTime inclusionDate;
 
     private Set<PersonDTO> people = new HashSet<>();
 
@@ -132,6 +139,22 @@ public class FilmDTO implements Serializable {
         this.url = url;
     }
 
+    public LocalDateTime getPublicationDate() {
+        return publicationDate;
+    }
+
+    public void setPublicationDate(LocalDateTime publicationDate) {
+        this.publicationDate = publicationDate;
+    }
+
+    public LocalDateTime getInclusionDate() {
+        return inclusionDate;
+    }
+
+    public void setInclusionDate(LocalDateTime inclusionDate) {
+        this.inclusionDate = inclusionDate;
+    }
+
     public Set<PersonDTO> getPeople() {
         return people;
     }
@@ -175,6 +198,8 @@ public class FilmDTO implements Serializable {
             ", filmType='" + getFilmType() + "'" +
             ", order=" + getOrder() +
             ", url='" + getUrl() + "'" +
+            ", publicationDate='" + getPublicationDate() + "'" +
+            ", inclusionDate='" + getInclusionDate() + "'" +
             ", people=" + getPeople() +
             "}";
     }
