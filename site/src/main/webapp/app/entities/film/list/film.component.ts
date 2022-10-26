@@ -12,10 +12,12 @@ import { EntityArrayResponseType, FilmService } from '../service/film.service';
 import { FilmDeleteDialogComponent } from '../delete/film-delete-dialog.component';
 import { DataUtils } from 'app/core/util/data-util.service';
 import { FilterOptions, IFilterOptions, IFilterOption } from 'app/shared/filter/filter.model';
+import { OverlayPanel } from 'primeng/overlaypanel';
 
 @Component({
   selector: 'jhi-film',
   templateUrl: './film.component.html',
+  styleUrls: ['./film.component.scss'],
 })
 export class FilmComponent implements OnInit {
   films?: IFilm[];
@@ -28,6 +30,29 @@ export class FilmComponent implements OnInit {
   itemsPerPage = ITEMS_PER_PAGE;
   totalItems = 0;
   page = 1;
+
+  responsiveOptions = [
+    {
+      breakpoint: '3840px',
+      numVisible: 5,
+      numScroll: 1,
+    },
+    {
+      breakpoint: '1024px',
+      numVisible: 4,
+      numScroll: 1,
+    },
+    {
+      breakpoint: '768px',
+      numVisible: 2,
+      numScroll: 1,
+    },
+    {
+      breakpoint: '560px',
+      numVisible: 1,
+      numScroll: 1,
+    },
+  ];
 
   constructor(
     protected filmService: FilmService,

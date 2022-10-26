@@ -6,7 +6,8 @@
         "refreshListLabel": "Refresh list",
         "createLabel": "Create a new Film",
         "createOrEditLabel": "Create or edit a Film",
-        "notFound": "No Films found"
+        "notFound": "No Films found",
+        "news": "News"
       },
       "created": "A new Film is created with identifier {{ param }}",
       "updated": "A Film is updated with identifier {{ param }}",

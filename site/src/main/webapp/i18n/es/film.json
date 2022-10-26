@@ -6,7 +6,8 @@
         "refreshListLabel": "Refrescar lista",
         "createLabel": "Crear nuevo Film",
         "createOrEditLabel": "Crear o editar Film",
-        "notFound": "Ningún Films encontrado"
+        "notFound": "Ningún Films encontrado",
+        "news": "Novedades"
       },
       "created": "Un nuevo Film ha sido creado con el identificador {{ param }}",
       "updated": "Un Film ha sido actualizado con el identificador {{ param }}",

@@ -8,10 +8,21 @@ import { IFilm } from '../film.model';
 })
 export class FilmCardComponent implements OnInit {
   @Input() film?: IFilm;
+  showSpecifications = false;
 
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  show(op: any, $event: any): void {
+    op.toggle($event);
+  }
+
+  hide(op: any): void {
+    setTimeout(() => {
+      op.hide();
+    }, 500);
   }
 
 }

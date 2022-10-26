@@ -176,8 +176,16 @@
 </div>
 
 <div *jhiHasAnyAuthority="'ROLE_USER'">
-  <h2><span jhiTranslate="streamingApp.person.home.distribution">Reparto</span></h2>
-  <div class="row">
-    <jhi-film-card class="col-sm-12 col-md-6 col-lg-3 col-xl-2" *ngFor="let film of films" [film]="film"></jhi-film-card>
-  </div>
+  <h2><span jhiTranslate="streamingApp.film.home.news">Novedades</span></h2>
+  <p-carousel
+    *ngIf="films"
+    [value]="films"
+    [circular]="true"
+    [responsiveOptions]="responsiveOptions"
+    [showIndicators]="false"
+  >
+    <ng-template let-film pTemplate="film">
+      <jhi-film-card [film]="film"></jhi-film-card>
+    </ng-template>
+  </p-carousel>
 </div>

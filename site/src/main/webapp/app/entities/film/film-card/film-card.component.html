@@ -1,1 +1,30 @@
-<p>film-card works!</p>
+<div *ngIf="film" class="film-card-container">
+  <div class="image-container">
+    <img
+      [src]="'data:' + film.coverContentType + ';base64,' + film.cover"
+      class="img-fluid"
+      alt="film image"
+      (mouseenter)="show(op, $event)"
+      (mouseout)="hide(op)"
+      [routerLink]="['/film', film.id, 'view']"
+    />
+  </div>
+
+  <p-overlayPanel #op id="op">
+    <ng-template pTemplate>
+      <p style="font-weight: bold">{{ film.title }}</p>
+      <p
+        style="
+          width: 300px;
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-align: justify;
+        "
+      >
+        {{ film.synopsis }}
+      </p>
+    </ng-template>
+  </p-overlayPanel>
+</div>
