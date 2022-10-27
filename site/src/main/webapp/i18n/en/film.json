@@ -15,7 +15,10 @@
       "updated": "A Film is updated with identifier {{ param }}",
       "deleted": "A Film is deleted with identifier {{ param }}",
       "delete": {
-        "question": "Are you sure you want to delete Film {{ id }}?"
+        "question": "Are you sure you want to delete {{ title }} with id: {{ id }}?",
+        "selected": {
+          "question":"Are you sure you want to delete selected films?"
+        }
       },
       "detail": {
         "title": "Film"

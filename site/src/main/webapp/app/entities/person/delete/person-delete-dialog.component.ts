@@ -9,7 +9,7 @@ import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
   templateUrl: './person-delete-dialog.component.html',
 })
 export class PersonDeleteDialogComponent {
-  person?: IPerson[];
+  people?: IPerson[];
 
   constructor(protected personService: PersonService, protected activeModal: NgbActiveModal) {}
 
@@ -17,14 +17,14 @@ export class PersonDeleteDialogComponent {
     this.activeModal.dismiss();
   }
 
-  confirmDelete(person: IPerson[]): void {
-    if (person.length === 1) {
-      this.personService.delete(person[0].id).subscribe(() => {
+  confirmDelete(people: IPerson[]): void {
+    if (people.length === 1) {
+      this.personService.delete(people[0].id).subscribe(() => {
         this.activeModal.close(ITEM_DELETED_EVENT);
       });
     } else {
-      person.forEach(p => {
-        this.personService.delete(p.id).subscribe(() => {
+      people.forEach(person => {
+        this.personService.delete(person.id).subscribe(() => {
           this.activeModal.close(ITEM_DELETED_EVENT);
         });
       });

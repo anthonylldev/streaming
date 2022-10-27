@@ -13,6 +13,8 @@ import { FilmDeleteDialogComponent } from '../delete/film-delete-dialog.componen
 import { DataUtils } from 'app/core/util/data-util.service';
 import { FilterOptions, IFilterOptions, IFilterOption } from 'app/shared/filter/filter.model';
 import { AccountService } from 'app/core/auth/account.service';
+import { Gender } from 'app/entities/enumerations/gender.model';
+import { FilmType } from 'app/entities/enumerations/film-type.model';
 
 @Component({
   selector: 'jhi-film',
@@ -34,6 +36,17 @@ export class FilmComponent implements OnInit {
   itemsPerPage = ITEMS_PER_PAGE;
   totalItems = 0;
   page = 1;
+
+  // Table
+  selectedFilms?: IFilm[];
+  film?: IFilm;
+
+  titleFilter = '';
+  filmTypeValues: string[] = [];
+  filmTypeFilter: string[] = [];
+
+  genderValues: string[] = [];
+  genderFilter: string[] = [];
 
   responsiveOptions = [
     {
@@ -80,6 +93,54 @@ export class FilmComponent implements OnInit {
         this.loadLastAddedFilms();
       }
     });
+
+    // * Map enums to list
+    Object.keys(FilmType).map(type => {
+      this.filmTypeValues.push(type);
+    });
+
+    Object.keys(Gender).map(gender => {
+      this.genderValues.push(gender);
+    });
+  }
+
+  clearFilters(): void {
+    this.filters.clear();
+    this.titleFilter = '';
+    this.filmTypeFilter = [];
+    this.genderFilter = [];
+  }
+
+  filterByTitle($event: string): void {
+    const titleFilterOption = this.filters.getFilterOptionByName('title.contains');
+
+    if (titleFilterOption) {
+      this.filters.removeFilter('title.contains');
+    }
+
+    if ($event.length >= 3) {
+      this.filters.addFilter('title.contains', ...[$event]);
+    }
+  }
+
+  filterByFilmType(): void {
+    const filmTypeFilterOption = this.filters.getFilterOptionByName('filmType.in');
+
+    if (filmTypeFilterOption) {
+      this.filters.removeFilter('filmType.in');
+    }
+
+    this.filters.addFilter('filmType.in', ...this.filmTypeFilter);
+  }
+
+  filterByGender(): void {
+    const genderFilterOption = this.filters.getFilterOptionByName('gender.in');
+
+    if (genderFilterOption) {
+      this.filters.removeFilter('gender.in');
+    }
+
+    this.filters.addFilter('gender.in', ...this.genderFilter);
   }
 
   byteSize(base64String: string): string {
@@ -92,7 +153,11 @@ export class FilmComponent implements OnInit {
 
   delete(film: IFilm): void {
     const modalRef = this.modalService.open(FilmDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.film = film;
+
+    // ? The film is wrapped in a list
+    const filmAux: IFilm[] = [film];
+
+    modalRef.componentInstance.films = filmAux;
     // unsubscribe not needed because closed completes on modal close
     modalRef.closed
       .pipe(
@@ -104,6 +169,26 @@ export class FilmComponent implements OnInit {
           this.onFilmsResponseSuccess(res);
         },
       });
+  }
+
+  deleteSelectedFilms(): void {
+    if (this.selectedFilms?.length === 1) {
+      this.delete(this.selectedFilms[0]);
+    } else {
+      const modalRef = this.modalService.open(FilmDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+      modalRef.componentInstance.films = this.selectedFilms;
+      // unsubscribe not needed because closed completes on modal close
+      modalRef.closed
+        .pipe(
+          filter(reason => reason === ITEM_DELETED_EVENT),
+          switchMap(() => this.loadFromBackendWithRouteInformations())
+        )
+        .subscribe({
+          next: (res: EntityArrayResponseType) => {
+            this.onFilmsResponseSuccess(res);
+          },
+        });
+    }
   }
 
   load(): void {

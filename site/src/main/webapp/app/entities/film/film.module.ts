@@ -8,11 +8,28 @@ import { FilmRoutingModule } from './route/film-routing.module';
 import { FilmCardComponent } from './film-card/film-card.component';
 import { CarouselModule } from 'primeng/carousel';
 import { TooltipModule } from 'primeng/tooltip';
-import {OverlayPanelModule} from 'primeng/overlaypanel';
-
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { TableModule } from 'primeng/table';
+import { ToolbarModule } from 'primeng/toolbar';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { DropdownModule } from 'primeng/dropdown';
 
 @NgModule({
-  imports: [SharedModule, FilmRoutingModule, CarouselModule, TooltipModule, OverlayPanelModule],
+  imports: [
+    SharedModule,
+    FilmRoutingModule,
+    CarouselModule,
+    TooltipModule,
+    OverlayPanelModule,
+    TableModule,
+    ToolbarModule,
+    ButtonModule,
+    InputTextModule,
+    MultiSelectModule,
+    DropdownModule,
+  ],
   declarations: [FilmComponent, FilmDetailComponent, FilmUpdateComponent, FilmDeleteDialogComponent, FilmCardComponent],
 })
 export class FilmModule {}

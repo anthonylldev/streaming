@@ -15,7 +15,10 @@
       "updated": "Un Film ha sido actualizado con el identificador {{ param }}",
       "deleted": "Un Film ha sido eliminado con el identificador {{ param }}",
       "delete": {
-        "question": "¿Seguro que quiere eliminar Film {{ id }}?"
+        "question": "¿Seguro que quiere eliminar {{ title }} con id: {{ id }}?",
+        "selected": {
+          "question": "¿Seguro que quiere eliminar las peliculas seleccionadas?"
+        }
       },
       "detail": {
         "title": "Film"

@@ -16,7 +16,7 @@ import { FilterOptions, IFilterOptions, IFilterOption } from 'app/shared/filter/
 @Component({
   selector: 'jhi-person',
   templateUrl: './person.component.html',
-  styleUrls: ["./person.component.scss"]
+  styleUrls: ['./person.component.scss'],
 })
 export class PersonComponent implements OnInit {
   people?: IPerson[];
@@ -42,24 +42,23 @@ export class PersonComponent implements OnInit {
     protected modalService: NgbModal
   ) {}
 
-
-  search($event: string): void {
-    if ($event.length >= 3) {
-      this.filters.clear();
-      this.filters.addFilter("name.contains", ...[$event]);
-    }
-
-    if ($event.length < 3) {
-      this.filters.clear();
-    }
-  }
-
   trackId = (_index: number, item: IPerson): number => this.personService.getPersonIdentifier(item);
 
   ngOnInit(): void {
     this.load();
 
     this.filters.filterChanges.subscribe(filterOptions => this.handleNavigation(1, this.predicate, this.ascending, filterOptions));
+  }
+
+  search($event: string): void {
+    if ($event.length >= 3) {
+      this.filters.clear();
+      this.filters.addFilter('name.contains', ...[$event]);
+    }
+
+    if ($event.length < 3) {
+      this.filters.clear();
+    }
   }
 
   byteSize(base64String: string): string {
@@ -73,10 +72,10 @@ export class PersonComponent implements OnInit {
   delete(person: IPerson): void {
     const modalRef = this.modalService.open(PersonDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
 
-    // ?The person is wrapped in a list
-    const personAux: IPerson[] = [person]
+    // ? The person is wrapped in a list
+    const peopleAux: IPerson[] = [person];
 
-    modalRef.componentInstance.person = personAux;
+    modalRef.componentInstance.people = peopleAux;
     // unsubscribe not needed because closed completes on modal close
     modalRef.closed
       .pipe(
@@ -92,21 +91,21 @@ export class PersonComponent implements OnInit {
 
   deleteSelectedPeople(): void {
     if (this.selectedPeople?.length === 1) {
-      this.delete(this.selectedPeople[0])
+      this.delete(this.selectedPeople[0]);
     } else {
-      const modalRef = this.modalService.open(PersonDeleteDialogComponent, { size: 'lg', backdrop: 'static'});
-    modalRef.componentInstance.person = this.selectedPeople;
-    // unsubscribe not needed because closed completes on modal close
-    modalRef.closed
-      .pipe(
-        filter(reason => reason === ITEM_DELETED_EVENT),
-        switchMap(() => this.loadFromBackendWithRouteInformations())
-      )
-      .subscribe({
-        next: (res: EntityArrayResponseType) => {
-          this.onResponseSuccess(res);
-        },
-      });
+      const modalRef = this.modalService.open(PersonDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+      modalRef.componentInstance.people = this.selectedPeople;
+      // unsubscribe not needed because closed completes on modal close
+      modalRef.closed
+        .pipe(
+          filter(reason => reason === ITEM_DELETED_EVENT),
+          switchMap(() => this.loadFromBackendWithRouteInformations())
+        )
+        .subscribe({
+          next: (res: EntityArrayResponseType) => {
+            this.onResponseSuccess(res);
+          },
+        });
     }
   }
 

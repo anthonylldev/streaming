@@ -1,14 +1,27 @@
-<form *ngIf="film" name="deleteForm" (ngSubmit)="confirmDelete(film.id!)">
+<form *ngIf="films" name="deleteForm" (ngSubmit)="confirmDelete(films!)" class="text-dark">
   <div class="modal-header">
     <h4 class="modal-title" data-cy="filmDeleteDialogHeading" jhiTranslate="entity.delete.title">Confirmar operación de borrado</h4>
 
-    <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="cancel()">&times;</button>
+    <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="cancel()"></button>
   </div>
 
   <div class="modal-body">
     <jhi-alert-error></jhi-alert-error>
-    <p id="jhi-delete-film-heading" jhiTranslate="streamingApp.film.delete.question" [translateValues]="{ id: film.id }">
-      ¿Seguro que quiere eliminar Film {{ film.id }}?
+    <p
+      *ngIf="films.length == 1"
+      id="jhi-delete-film-heading"
+      jhiTranslate="streamingApp.film.delete.question"
+      [translateValues]="{ id: films[0].id, title: films[0].title }"
+    >
+      ¿Seguro que quiere eliminar {{ films[0].title }} con id: {{ films[0].id }}?
+    </p>
+
+    <p
+      *ngIf="films.length > 1"
+      id="jhi-delete-film-heading"
+      jhiTranslate="streamingApp.film.delete.selected.question"
+    >
+      ¿Seguro que quiere eliminar {{ films[0].title }} con id: {{ films[0].id }}?
     </p>
   </div>
 
