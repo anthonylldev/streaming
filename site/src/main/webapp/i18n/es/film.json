@@ -7,7 +7,9 @@
         "createLabel": "Crear nuevo Film",
         "createOrEditLabel": "Crear o editar Film",
         "notFound": "Ningún Films encontrado",
-        "news": "Novedades"
+        "news": "Novedades",
+        "lastAdded": "Ultimas añadidas",
+        "mostPopular": "Mas populares"
       },
       "created": "Un nuevo Film ha sido creado con el identificador {{ param }}",
       "updated": "Un Film ha sido actualizado con el identificador {{ param }}",

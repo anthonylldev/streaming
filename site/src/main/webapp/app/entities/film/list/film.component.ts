@@ -12,7 +12,7 @@ import { EntityArrayResponseType, FilmService } from '../service/film.service';
 import { FilmDeleteDialogComponent } from '../delete/film-delete-dialog.component';
 import { DataUtils } from 'app/core/util/data-util.service';
 import { FilterOptions, IFilterOptions, IFilterOption } from 'app/shared/filter/filter.model';
-import { OverlayPanel } from 'primeng/overlaypanel';
+import { AccountService } from 'app/core/auth/account.service';
 
 @Component({
   selector: 'jhi-film',
@@ -21,6 +21,10 @@ import { OverlayPanel } from 'primeng/overlaypanel';
 })
 export class FilmComponent implements OnInit {
   films?: IFilm[];
+  mostPopularFilms?: IFilm[];
+  newFilms?: IFilm[];
+  lastAddedFilms?: IFilm[];
+
   isLoading = false;
 
   predicate = 'id';
@@ -59,15 +63,23 @@ export class FilmComponent implements OnInit {
     protected activatedRoute: ActivatedRoute,
     public router: Router,
     protected dataUtils: DataUtils,
-    protected modalService: NgbModal
+    protected modalService: NgbModal,
+    protected accountService: AccountService
   ) {}
 
   trackId = (_index: number, item: IFilm): number => this.filmService.getFilmIdentifier(item);
 
   ngOnInit(): void {
-    this.load();
-
-    this.filters.filterChanges.subscribe(filterOptions => this.handleNavigation(1, this.predicate, this.ascending, filterOptions));
+    this.accountService.getAuthenticationState().subscribe(auth => {
+      if (auth?.authorities[0] === 'ROLE_ADMIN') {
+        this.load();
+        this.filters.filterChanges.subscribe(filterOptions => this.handleNavigation(1, this.predicate, this.ascending, filterOptions));
+      } else {
+        this.loadMostPopularFilms();
+        this.loadNewFilms();
+        this.loadLastAddedFilms();
+      }
+    });
   }
 
   byteSize(base64String: string): string {
@@ -89,7 +101,7 @@ export class FilmComponent implements OnInit {
       )
       .subscribe({
         next: (res: EntityArrayResponseType) => {
-          this.onResponseSuccess(res);
+          this.onFilmsResponseSuccess(res);
         },
       });
   }
@@ -97,7 +109,7 @@ export class FilmComponent implements OnInit {
   load(): void {
     this.loadFromBackendWithRouteInformations().subscribe({
       next: (res: EntityArrayResponseType) => {
-        this.onResponseSuccess(res);
+        this.onFilmsResponseSuccess(res);
       },
     });
   }
@@ -117,6 +129,30 @@ export class FilmComponent implements OnInit {
     );
   }
 
+  protected loadMostPopularFilms(): void {
+    this.queryBackend(1, 'views', false, undefined).subscribe({
+      next: (res: EntityArrayResponseType) => {
+        this.onMostPopularFilmsResponseSuccess(res);
+      },
+    });
+  }
+
+  protected loadNewFilms(): void {
+    this.queryBackend(1, 'publicationDate', false, undefined).subscribe({
+      next: (res: EntityArrayResponseType) => {
+        this.onNewFilmsResponseSuccess(res);
+      },
+    });
+  }
+
+  protected loadLastAddedFilms(): void {
+    this.queryBackend(1, 'inclusionDate', false, undefined).subscribe({
+      next: (res: EntityArrayResponseType) => {
+        this.onLastAddedFilmsResponseSuccess(res);
+      },
+    });
+  }
+
   protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
     const page = params.get(PAGE_HEADER);
     this.page = +(page ?? 1);
@@ -126,10 +162,28 @@ export class FilmComponent implements OnInit {
     this.filters.initializeFromParams(params);
   }
 
-  protected onResponseSuccess(response: EntityArrayResponseType): void {
+  protected onFilmsResponseSuccess(response: EntityArrayResponseType): void {
     this.fillComponentAttributesFromResponseHeader(response.headers);
     const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
     this.films = dataFromBody;
+  }
+
+  protected onMostPopularFilmsResponseSuccess(response: EntityArrayResponseType): void {
+    this.fillComponentAttributesFromResponseHeader(response.headers);
+    const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
+    this.mostPopularFilms = dataFromBody;
+  }
+
+  protected onNewFilmsResponseSuccess(response: EntityArrayResponseType): void {
+    this.fillComponentAttributesFromResponseHeader(response.headers);
+    const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
+    this.newFilms = dataFromBody;
+  }
+
+  protected onLastAddedFilmsResponseSuccess(response: EntityArrayResponseType): void {
+    this.fillComponentAttributesFromResponseHeader(response.headers);
+    const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
+    this.lastAddedFilms = dataFromBody;
   }
 
   protected fillComponentAttributesFromResponseBody(data: IFilm[] | null): IFilm[] {

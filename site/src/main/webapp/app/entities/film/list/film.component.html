@@ -176,16 +176,30 @@
 </div>
 
 <div *jhiHasAnyAuthority="'ROLE_USER'">
-  <h2><span jhiTranslate="streamingApp.film.home.news">Novedades</span></h2>
-  <p-carousel
-    *ngIf="films"
-    [value]="films"
-    [circular]="true"
-    [responsiveOptions]="responsiveOptions"
-    [showIndicators]="false"
-  >
-    <ng-template let-film pTemplate="film">
-      <jhi-film-card [film]="film"></jhi-film-card>
-    </ng-template>
-  </p-carousel>
+  <div *ngIf="mostPopularFilms">
+    <h2><span jhiTranslate="streamingApp.film.home.mostPopular">Mas popular</span></h2>
+    <p-carousel [value]="mostPopularFilms" [circular]="true" [responsiveOptions]="responsiveOptions" [showIndicators]="false">
+      <ng-template let-film pTemplate="film">
+        <jhi-film-card [film]="film"></jhi-film-card>
+      </ng-template>
+    </p-carousel>
+  </div>
+
+  <div *ngIf="newFilms">
+    <h2><span jhiTranslate="streamingApp.film.home.news">Novedades</span></h2>
+    <p-carousel [value]="newFilms" [circular]="true" [responsiveOptions]="responsiveOptions" [showIndicators]="false">
+      <ng-template let-film pTemplate="film">
+        <jhi-film-card [film]="film"></jhi-film-card>
+      </ng-template>
+    </p-carousel>
+  </div>
+
+  <div *ngIf="lastAddedFilms">
+    <h2><span jhiTranslate="streamingApp.film.home.lastAdded">Ultimas añadidas</span></h2>
+    <p-carousel [value]="lastAddedFilms" [circular]="true" [responsiveOptions]="responsiveOptions" [showIndicators]="false">
+      <ng-template let-film pTemplate="film">
+        <jhi-film-card [film]="film"></jhi-film-card>
+      </ng-template>
+    </p-carousel>
+  </div>
 </div>
