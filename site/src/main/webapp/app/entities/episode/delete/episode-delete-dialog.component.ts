@@ -9,7 +9,7 @@ import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
   templateUrl: './episode-delete-dialog.component.html',
 })
 export class EpisodeDeleteDialogComponent {
-  episode?: IEpisode;
+  episodes?: IEpisode[];
 
   constructor(protected episodeService: EpisodeService, protected activeModal: NgbActiveModal) {}
 
@@ -17,9 +17,20 @@ export class EpisodeDeleteDialogComponent {
     this.activeModal.dismiss();
   }
 
-  confirmDelete(id: number): void {
-    this.episodeService.delete(id).subscribe(() => {
+  confirmDelete(episodes: IEpisode[]): void {
+
+    if (episodes.length === 1) {
+      this.episodeService.delete(episodes[0].id).subscribe(() => {
+        this.activeModal.close(ITEM_DELETED_EVENT);
+      });
+    } else {
+      episodes.forEach(episode => {
+        this.episodeService.delete(episode.id).subscribe(() => {
+          this.activeModal.close(ITEM_DELETED_EVENT);
+        });
+      });
+
       this.activeModal.close(ITEM_DELETED_EVENT);
-    });
+    }
   }
 }

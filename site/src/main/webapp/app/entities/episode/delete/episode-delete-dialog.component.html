@@ -1,14 +1,22 @@
-<form *ngIf="episode" name="deleteForm" (ngSubmit)="confirmDelete(episode.id!)">
+<form *ngIf="episodes" name="deleteForm" (ngSubmit)="confirmDelete(episodes!)" class="text-dark">
   <div class="modal-header">
     <h4 class="modal-title" data-cy="episodeDeleteDialogHeading" jhiTranslate="entity.delete.title">Confirmar operación de borrado</h4>
 
-    <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="cancel()">&times;</button>
+    <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="cancel()"></button>
   </div>
 
   <div class="modal-body">
     <jhi-alert-error></jhi-alert-error>
-    <p id="jhi-delete-episode-heading" jhiTranslate="streamingApp.episode.delete.question" [translateValues]="{ id: episode.id }">
-      ¿Seguro que quiere eliminar Episode {{ episode.id }}?
+    <p
+      *ngIf="episodes.length == 1"
+      id="jhi-delete-episode-heading"
+      jhiTranslate="streamingApp.episode.delete.question"
+      [translateValues]="{ id: episodes[0].id, title: episodes[0].title }"
+    >
+      ¿Seguro que quiere eliminar el episodio {{ episodes[0].title }} con id: {{ episodes[0].id }}?
+    </p>
+    <p *ngIf="episodes.length > 1" id="jhi-delete-episode-heading" jhiTranslate="streamingApp.episode.delete.selected.question">
+      ¿Seguro que quiere eliminar los episodios seleccionados?
     </p>
   </div>
 

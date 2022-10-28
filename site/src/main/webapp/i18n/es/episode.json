@@ -12,7 +12,10 @@
       "updated": "Un Episode ha sido actualizado con el identificador {{ param }}",
       "deleted": "Un Episode ha sido eliminado con el identificador {{ param }}",
       "delete": {
-        "question": "¿Seguro que quiere eliminar Episode {{ id }}?"
+        "question": "¿Seguro que quiere eliminar el episodio {{ title }} con id: {{ id }}?",
+        "selected": {
+          "question":"¿Seguro que quiere eliminar los episodios seleccionados?"
+        }
       },
       "detail": {
         "title": "Episode"

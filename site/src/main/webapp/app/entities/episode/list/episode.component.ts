@@ -11,6 +11,7 @@ import { ASC, DESC, SORT, ITEM_DELETED_EVENT, DEFAULT_SORT_DATA } from 'app/conf
 import { EntityArrayResponseType, EpisodeService } from '../service/episode.service';
 import { EpisodeDeleteDialogComponent } from '../delete/episode-delete-dialog.component';
 import { FilterOptions, IFilterOptions, IFilterOption } from 'app/shared/filter/filter.model';
+import { AccountService } from 'app/core/auth/account.service';
 
 @Component({
   selector: 'jhi-episode',
@@ -18,6 +19,7 @@ import { FilterOptions, IFilterOptions, IFilterOption } from 'app/shared/filter/
 })
 export class EpisodeComponent implements OnInit {
   episodes?: IEpisode[];
+  selectedEpisodes?: IEpisode[];
   isLoading = false;
 
   predicate = 'id';
@@ -28,24 +30,53 @@ export class EpisodeComponent implements OnInit {
   totalItems = 0;
   page = 1;
 
+  titleFilter = '';
+
   constructor(
     protected episodeService: EpisodeService,
     protected activatedRoute: ActivatedRoute,
     public router: Router,
-    protected modalService: NgbModal
+    protected modalService: NgbModal,
+    protected accountService: AccountService
   ) {}
 
   trackId = (_index: number, item: IEpisode): number => this.episodeService.getEpisodeIdentifier(item);
 
   ngOnInit(): void {
-    this.load();
+    this.accountService.getAuthenticationState().subscribe(auth => {
+      if (auth?.authorities[0] === 'ROLE_ADMIN') {
+        this.load();
+        this.filters.filterChanges.subscribe(filterOptions => this.handleNavigation(1, this.predicate, this.ascending, filterOptions));
+      } else {
+        // load when user have role user
+      }
+    });
+  }
 
-    this.filters.filterChanges.subscribe(filterOptions => this.handleNavigation(1, this.predicate, this.ascending, filterOptions));
+  clearFilters(): void {
+    this.filters.clear();
+    this.titleFilter = '';
+  }
+
+  filterByTitle($event: string): void {
+    const titleFilterOption = this.filters.getFilterOptionByName('title.contains');
+
+    if (titleFilterOption) {
+      this.filters.removeFilter('title.contains');
+    }
+
+    if ($event.length >= 3) {
+      this.filters.addFilter('title.contains', ...[$event]);
+    }
   }
 
   delete(episode: IEpisode): void {
     const modalRef = this.modalService.open(EpisodeDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.episode = episode;
+
+    // ? The episode is wrapped in a list
+    const episodeAux: IEpisode[] = [episode];
+
+    modalRef.componentInstance.episodes = episodeAux;
     // unsubscribe not needed because closed completes on modal close
     modalRef.closed
       .pipe(
@@ -57,6 +88,26 @@ export class EpisodeComponent implements OnInit {
           this.onResponseSuccess(res);
         },
       });
+  }
+
+  deleteSelectedFilms(): void {
+    if (this.selectedEpisodes?.length === 1) {
+      this.delete(this.selectedEpisodes[0]);
+    } else {
+      const modalRef = this.modalService.open(EpisodeDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+      modalRef.componentInstance.episodes = this.selectedEpisodes;
+      // unsubscribe not needed because closed completes on modal close
+      modalRef.closed
+        .pipe(
+          filter(reason => reason === ITEM_DELETED_EVENT),
+          switchMap(() => this.loadFromBackendWithRouteInformations())
+        )
+        .subscribe({
+          next: (res: EntityArrayResponseType) => {
+            this.onResponseSuccess(res);
+          },
+        });
+    }
   }
 
   load(): void {

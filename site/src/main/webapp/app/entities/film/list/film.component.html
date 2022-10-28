@@ -23,7 +23,6 @@
       *ngIf="films"
       #dt2
       [value]="films"
-      [globalFilterFields]="['name']"
       responsiveLayout="scroll"
       [(selection)]="selectedFilms"
       [rowHover]="true"
@@ -32,7 +31,7 @@
     >
       <ng-template pTemplate="caption">
         <div class="flex align-items-center justify-content-between">
-          <h5 class="m-0">Manage Film</h5>
+          <h5 class="m-0">Manage Films</h5>
         </div>
       </ng-template>
       <ng-template pTemplate="header">
@@ -48,7 +47,14 @@
             <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
           </th>
           <th>
-            <input class="filter" pInputText placeholder="Title..." type="text" (ngModelChange)="filterByTitle($event)" [(ngModel)]="titleFilter" />
+            <input
+              class="filter"
+              pInputText
+              placeholder="Title..."
+              type="text"
+              (ngModelChange)="filterByTitle($event)"
+              [(ngModel)]="titleFilter"
+            />
           </th>
           <th>
             <p-multiSelect [(ngModel)]="filmTypeFilter" [options]="filmTypeValues" placeholder="Any" (ngModelChange)="filterByFilmType()">
@@ -101,7 +107,7 @@
       </ng-template>
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="5">No customers found.</td>
+          <td colspan="5">No films found.</td>
         </tr>
       </ng-template>
     </p-table>

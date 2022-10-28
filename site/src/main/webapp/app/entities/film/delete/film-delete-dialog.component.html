@@ -16,12 +16,8 @@
       ¿Seguro que quiere eliminar {{ films[0].title }} con id: {{ films[0].id }}?
     </p>
 
-    <p
-      *ngIf="films.length > 1"
-      id="jhi-delete-film-heading"
-      jhiTranslate="streamingApp.film.delete.selected.question"
-    >
-      ¿Seguro que quiere eliminar {{ films[0].title }} con id: {{ films[0].id }}?
+    <p *ngIf="films.length > 1" id="jhi-delete-film-heading" jhiTranslate="streamingApp.film.delete.selected.question">
+      ¿Seguro que quiere eliminar las peliculas seleccionadas?
     </p>
   </div>
 
