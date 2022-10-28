@@ -6,13 +6,19 @@
         "refreshListLabel": "Refresh list",
         "createLabel": "Create a new Film",
         "createOrEditLabel": "Create or edit a Film",
-        "notFound": "No Films found"
+        "notFound": "No Films found",
+        "news": "News",
+        "lastAdded": "Last added",
+        "mostPopular": "Most popular"
       },
       "created": "A new Film is created with identifier {{ param }}",
       "updated": "A Film is updated with identifier {{ param }}",
       "deleted": "A Film is deleted with identifier {{ param }}",
       "delete": {
-        "question": "Are you sure you want to delete Film {{ id }}?"
+        "question": "Are you sure you want to delete {{ title }} with id: {{ id }}?",
+        "selected": {
+          "question":"Are you sure you want to delete selected films?"
+        }
       },
       "detail": {
         "title": "Film"

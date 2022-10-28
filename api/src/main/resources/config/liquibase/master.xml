@@ -19,4 +19,5 @@
     <include file="config/liquibase/changelog/20221019153445_added_entity_constraints_Episode.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
+    <include file="config/liquibase/changelog/20221026095000_added_entity_columns_Film.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

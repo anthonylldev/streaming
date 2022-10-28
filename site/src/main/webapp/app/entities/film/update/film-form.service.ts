@@ -14,7 +14,7 @@ type PartialWithRequiredKeyOf<T extends { id: unknown }> = Partial<Omit<T, 'id'>
  */
 type FilmFormGroupInput = IFilm | PartialWithRequiredKeyOf<NewFilm>;
 
-type FilmFormDefaults = Pick<NewFilm, 'id' | 'people'>;
+type FilmFormDefaults = Pick<NewFilm, 'id' | 'people' | 'inclusionDate'>;
 
 type FilmFormGroupContent = {
   id: FormControl<IFilm['id'] | NewFilm['id']>;
@@ -28,6 +28,8 @@ type FilmFormGroupContent = {
   filmType: FormControl<IFilm['filmType']>;
   order: FormControl<IFilm['order']>;
   url: FormControl<IFilm['url']>;
+  publicationDate: FormControl<IFilm['publicationDate']>;
+  inclusionDate: FormControl<IFilm['inclusionDate']>;
   people: FormControl<IFilm['people']>;
 };
 
@@ -66,6 +68,8 @@ export class FilmFormService {
       url: new FormControl(filmRawValue.url, {
         validators: [Validators.required],
       }),
+      publicationDate: new FormControl(filmRawValue.publicationDate ?? this.createDateAsUTC()),   // TODO: delete default value
+      inclusionDate: new FormControl(filmRawValue.inclusionDate ?? this.createDateAsUTC()),
       people: new FormControl(filmRawValue.people ?? []),
     });
   }
@@ -88,6 +92,12 @@ export class FilmFormService {
     return {
       id: null,
       people: [],
+      inclusionDate: this.createDateAsUTC()
     };
+  }
+
+  private createDateAsUTC(): Date {
+    const date: Date = new Date();
+    return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()));
   }
 }

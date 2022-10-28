@@ -1,4 +1,4 @@
-<form *ngIf="person" name="deleteForm" (ngSubmit)="confirmDelete(person!)" class="text-dark">
+<form *ngIf="people" name="deleteForm" (ngSubmit)="confirmDelete(people!)" class="text-dark">
   <div class="modal-header">
     <h4 class="modal-title" data-cy="personDeleteDialogHeading" jhiTranslate="entity.delete.title">Confirmar operación de borrado</h4>
 
@@ -7,11 +7,20 @@
 
   <div class="modal-body">
     <jhi-alert-error></jhi-alert-error>
-    <p *ngIf="person.length == 1" id="jhi-delete-person-heading" jhiTranslate="streamingApp.person.delete.question" [translateValues]="{ id: person[0].id, name: person[0].name }">
-      ¿Seguro que quiere eliminar a {{ person[0].name }} con id: {{ person[0].id }}?
+    <p
+      *ngIf="people.length == 1"
+      id="jhi-delete-person-heading"
+      jhiTranslate="streamingApp.person.delete.question"
+      [translateValues]="{ id: people[0].id, name: people[0].name }"
+    >
+      ¿Seguro que quiere eliminar a {{ people[0].name }} con id: {{ people[0].id }}?
     </p>
-    <p *ngIf="person.length > 1" id="jhi-delete-person-heading" jhiTranslate="streamingApp.person.delete.selected.question" [translateValues]="{ id: person[0].id, name: person[0].name }">
-      ¿Seguro que quiere eliminar a {{ person[0].name }} con id: {{ person[0].id }}?
+    <p
+      *ngIf="people.length > 1"
+      id="jhi-delete-person-heading"
+      jhiTranslate="streamingApp.person.delete.selected.question"
+    >
+    ¿Seguro que quiere eliminar a las personas seleccionadas?
     </p>
   </div>
 

@@ -12,13 +12,21 @@ import { EntityArrayResponseType, FilmService } from '../service/film.service';
 import { FilmDeleteDialogComponent } from '../delete/film-delete-dialog.component';
 import { DataUtils } from 'app/core/util/data-util.service';
 import { FilterOptions, IFilterOptions, IFilterOption } from 'app/shared/filter/filter.model';
+import { AccountService } from 'app/core/auth/account.service';
+import { Gender } from 'app/entities/enumerations/gender.model';
+import { FilmType } from 'app/entities/enumerations/film-type.model';
 
 @Component({
   selector: 'jhi-film',
   templateUrl: './film.component.html',
+  styleUrls: ['./film.component.scss'],
 })
 export class FilmComponent implements OnInit {
   films?: IFilm[];
+  mostPopularFilms?: IFilm[];
+  newFilms?: IFilm[];
+  lastAddedFilms?: IFilm[];
+
   isLoading = false;
 
   predicate = 'id';
@@ -29,20 +37,110 @@ export class FilmComponent implements OnInit {
   totalItems = 0;
   page = 1;
 
+  // Table
+  selectedFilms?: IFilm[];
+  film?: IFilm;
+
+  titleFilter = '';
+  filmTypeValues: string[] = [];
+  filmTypeFilter: string[] = [];
+
+  genderValues: string[] = [];
+  genderFilter: string[] = [];
+
+  responsiveOptions = [
+    {
+      breakpoint: '3840px',
+      numVisible: 5,
+      numScroll: 1,
+    },
+    {
+      breakpoint: '1024px',
+      numVisible: 4,
+      numScroll: 1,
+    },
+    {
+      breakpoint: '768px',
+      numVisible: 2,
+      numScroll: 1,
+    },
+    {
+      breakpoint: '560px',
+      numVisible: 1,
+      numScroll: 1,
+    },
+  ];
+
   constructor(
     protected filmService: FilmService,
     protected activatedRoute: ActivatedRoute,
     public router: Router,
     protected dataUtils: DataUtils,
-    protected modalService: NgbModal
+    protected modalService: NgbModal,
+    protected accountService: AccountService
   ) {}
 
   trackId = (_index: number, item: IFilm): number => this.filmService.getFilmIdentifier(item);
 
   ngOnInit(): void {
-    this.load();
+    this.accountService.getAuthenticationState().subscribe(auth => {
+      if (auth?.authorities[0] === 'ROLE_ADMIN') {
+        this.load();
+        this.filters.filterChanges.subscribe(filterOptions => this.handleNavigation(1, this.predicate, this.ascending, filterOptions));
+      } else {
+        this.loadMostPopularFilms();
+        this.loadNewFilms();
+        this.loadLastAddedFilms();
+      }
+    });
 
-    this.filters.filterChanges.subscribe(filterOptions => this.handleNavigation(1, this.predicate, this.ascending, filterOptions));
+    // * Map enums to list
+    Object.keys(FilmType).map(type => {
+      this.filmTypeValues.push(type);
+    });
+
+    Object.keys(Gender).map(gender => {
+      this.genderValues.push(gender);
+    });
+  }
+
+  clearFilters(): void {
+    this.filters.clear();
+    this.titleFilter = '';
+    this.filmTypeFilter = [];
+    this.genderFilter = [];
+  }
+
+  filterByTitle($event: string): void {
+    const titleFilterOption = this.filters.getFilterOptionByName('title.contains');
+
+    if (titleFilterOption) {
+      this.filters.removeFilter('title.contains');
+    }
+
+    if ($event.length >= 3) {
+      this.filters.addFilter('title.contains', ...[$event]);
+    }
+  }
+
+  filterByFilmType(): void {
+    const filmTypeFilterOption = this.filters.getFilterOptionByName('filmType.in');
+
+    if (filmTypeFilterOption) {
+      this.filters.removeFilter('filmType.in');
+    }
+
+    this.filters.addFilter('filmType.in', ...this.filmTypeFilter);
+  }
+
+  filterByGender(): void {
+    const genderFilterOption = this.filters.getFilterOptionByName('gender.in');
+
+    if (genderFilterOption) {
+      this.filters.removeFilter('gender.in');
+    }
+
+    this.filters.addFilter('gender.in', ...this.genderFilter);
   }
 
   byteSize(base64String: string): string {
@@ -55,7 +153,11 @@ export class FilmComponent implements OnInit {
 
   delete(film: IFilm): void {
     const modalRef = this.modalService.open(FilmDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.film = film;
+
+    // ? The film is wrapped in a list
+    const filmAux: IFilm[] = [film];
+
+    modalRef.componentInstance.films = filmAux;
     // unsubscribe not needed because closed completes on modal close
     modalRef.closed
       .pipe(
@@ -64,15 +166,35 @@ export class FilmComponent implements OnInit {
       )
       .subscribe({
         next: (res: EntityArrayResponseType) => {
-          this.onResponseSuccess(res);
+          this.onFilmsResponseSuccess(res);
         },
       });
+  }
+
+  deleteSelectedFilms(): void {
+    if (this.selectedFilms?.length === 1) {
+      this.delete(this.selectedFilms[0]);
+    } else {
+      const modalRef = this.modalService.open(FilmDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+      modalRef.componentInstance.films = this.selectedFilms;
+      // unsubscribe not needed because closed completes on modal close
+      modalRef.closed
+        .pipe(
+          filter(reason => reason === ITEM_DELETED_EVENT),
+          switchMap(() => this.loadFromBackendWithRouteInformations())
+        )
+        .subscribe({
+          next: (res: EntityArrayResponseType) => {
+            this.onFilmsResponseSuccess(res);
+          },
+        });
+    }
   }
 
   load(): void {
     this.loadFromBackendWithRouteInformations().subscribe({
       next: (res: EntityArrayResponseType) => {
-        this.onResponseSuccess(res);
+        this.onFilmsResponseSuccess(res);
       },
     });
   }
@@ -92,6 +214,30 @@ export class FilmComponent implements OnInit {
     );
   }
 
+  protected loadMostPopularFilms(): void {
+    this.queryBackend(1, 'views', false, undefined).subscribe({
+      next: (res: EntityArrayResponseType) => {
+        this.onMostPopularFilmsResponseSuccess(res);
+      },
+    });
+  }
+
+  protected loadNewFilms(): void {
+    this.queryBackend(1, 'publicationDate', false, undefined).subscribe({
+      next: (res: EntityArrayResponseType) => {
+        this.onNewFilmsResponseSuccess(res);
+      },
+    });
+  }
+
+  protected loadLastAddedFilms(): void {
+    this.queryBackend(1, 'inclusionDate', false, undefined).subscribe({
+      next: (res: EntityArrayResponseType) => {
+        this.onLastAddedFilmsResponseSuccess(res);
+      },
+    });
+  }
+
   protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
     const page = params.get(PAGE_HEADER);
     this.page = +(page ?? 1);
@@ -101,10 +247,28 @@ export class FilmComponent implements OnInit {
     this.filters.initializeFromParams(params);
   }
 
-  protected onResponseSuccess(response: EntityArrayResponseType): void {
+  protected onFilmsResponseSuccess(response: EntityArrayResponseType): void {
     this.fillComponentAttributesFromResponseHeader(response.headers);
     const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
     this.films = dataFromBody;
+  }
+
+  protected onMostPopularFilmsResponseSuccess(response: EntityArrayResponseType): void {
+    this.fillComponentAttributesFromResponseHeader(response.headers);
+    const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
+    this.mostPopularFilms = dataFromBody;
+  }
+
+  protected onNewFilmsResponseSuccess(response: EntityArrayResponseType): void {
+    this.fillComponentAttributesFromResponseHeader(response.headers);
+    const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
+    this.newFilms = dataFromBody;
+  }
+
+  protected onLastAddedFilmsResponseSuccess(response: EntityArrayResponseType): void {
+    this.fillComponentAttributesFromResponseHeader(response.headers);
+    const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
+    this.lastAddedFilms = dataFromBody;
   }
 
   protected fillComponentAttributesFromResponseBody(data: IFilm[] | null): IFilm[] {

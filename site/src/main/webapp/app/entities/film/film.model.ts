@@ -14,6 +14,8 @@ export interface IFilm {
   filmType?: FilmType | null;
   order?: number | null;
   url?: string | null;
+  publicationDate?: Date | null;
+  inclusionDate?: Date | null;
   people?: Pick<IPerson, 'id'>[] | null;
 }
 

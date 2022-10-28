@@ -9,7 +9,7 @@ import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
   templateUrl: './film-delete-dialog.component.html',
 })
 export class FilmDeleteDialogComponent {
-  film?: IFilm;
+  films?: IFilm[];
 
   constructor(protected filmService: FilmService, protected activeModal: NgbActiveModal) {}
 
@@ -17,9 +17,19 @@ export class FilmDeleteDialogComponent {
     this.activeModal.dismiss();
   }
 
-  confirmDelete(id: number): void {
-    this.filmService.delete(id).subscribe(() => {
+  confirmDelete(films: IFilm[]): void {
+    if (films.length === 1) {
+      this.filmService.delete(films[0].id).subscribe(() => {
+        this.activeModal.close(ITEM_DELETED_EVENT);
+      });
+    } else {
+      films.forEach(film => {
+        this.filmService.delete(film.id).subscribe(() => {
+          this.activeModal.close(ITEM_DELETED_EVENT);
+        });
+      });
+
       this.activeModal.close(ITEM_DELETED_EVENT);
-    });
+    }
   }
 }

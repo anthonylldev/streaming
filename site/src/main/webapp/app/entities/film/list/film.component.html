@@ -1,174 +1,152 @@
-<div>
-  <h2 id="page-heading" data-cy="FilmHeading">
-    <span jhiTranslate="streamingApp.film.home.title">Films</span>
+<div *jhiHasAnyAuthority="'ROLE_ADMIN'">
+  <div class="container">
+    <p-toolbar styleClass="mb-4">
+      <ng-template pTemplate="left">
+        <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2" [routerLink]="['/film/new']"></button>
+        <button
+          pButton
+          pRipple
+          label="Delete"
+          icon="pi pi-trash"
+          class="p-button-danger"
+          (click)="deleteSelectedFilms()"
+          [disabled]="!selectedFilms || !selectedFilms.length"
+        ></button>
+      </ng-template>
 
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
-        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
-        <span jhiTranslate="streamingApp.film.home.refreshListLabel">Refrescar lista</span>
-      </button>
+      <ng-template pTemplate="right">
+        <button pButton pRipple label="Export" icon="pi pi-upload" class="p-button-help"></button>
+      </ng-template>
+    </p-toolbar>
 
-      <button
-        id="jh-create-entity"
-        data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-film"
-        [routerLink]="['/film/new']"
-      >
-        <fa-icon icon="plus"></fa-icon>
-        <span jhiTranslate="streamingApp.film.home.createLabel"> Crear nuevo Film </span>
-      </button>
-    </div>
-  </h2>
-
-  <jhi-alert-error></jhi-alert-error>
-
-  <jhi-alert></jhi-alert>
-
-  <jhi-filter [filters]="filters"></jhi-filter>
-
-  <div class="alert alert-warning" id="no-result" *ngIf="films?.length === 0">
-    <span jhiTranslate="streamingApp.film.home.notFound">Ningún Films encontrado</span>
-  </div>
-
-  <div class="table-responsive table-entities" id="entities" *ngIf="films && films.length > 0">
-    <table class="table table-striped" aria-describedby="page-heading">
-      <thead>
-        <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="navigateToWithComponentValues()">
-          <th scope="col" jhiSortBy="id">
-            <div class="d-flex">
-              <span jhiTranslate="global.field.id">ID</span>
-              <fa-icon class="p-1" icon="sort"></fa-icon>
-            </div>
-          </th>
-          <th scope="col" jhiSortBy="title">
-            <div class="d-flex">
-              <span jhiTranslate="streamingApp.film.title">Title</span>
-              <fa-icon class="p-1" icon="sort"></fa-icon>
-            </div>
-          </th>
-          <th scope="col" jhiSortBy="synopsis">
-            <div class="d-flex">
-              <span jhiTranslate="streamingApp.film.synopsis">Synopsis</span>
-              <fa-icon class="p-1" icon="sort"></fa-icon>
-            </div>
-          </th>
-          <th scope="col" jhiSortBy="views">
-            <div class="d-flex">
-              <span jhiTranslate="streamingApp.film.views">Views</span>
-              <fa-icon class="p-1" icon="sort"></fa-icon>
-            </div>
-          </th>
-          <th scope="col" jhiSortBy="cover">
-            <div class="d-flex">
-              <span jhiTranslate="streamingApp.film.cover">Cover</span>
-              <fa-icon class="p-1" icon="sort"></fa-icon>
-            </div>
-          </th>
-          <th scope="col" jhiSortBy="reviews">
-            <div class="d-flex">
-              <span jhiTranslate="streamingApp.film.reviews">Reviews</span>
-              <fa-icon class="p-1" icon="sort"></fa-icon>
-            </div>
-          </th>
-          <th scope="col" jhiSortBy="gender">
-            <div class="d-flex">
-              <span jhiTranslate="streamingApp.film.gender">Gender</span>
-              <fa-icon class="p-1" icon="sort"></fa-icon>
-            </div>
-          </th>
-          <th scope="col" jhiSortBy="filmType">
-            <div class="d-flex">
-              <span jhiTranslate="streamingApp.film.filmType">Film Type</span>
-              <fa-icon class="p-1" icon="sort"></fa-icon>
-            </div>
-          </th>
-          <th scope="col" jhiSortBy="order">
-            <div class="d-flex">
-              <span jhiTranslate="streamingApp.film.order">Order</span>
-              <fa-icon class="p-1" icon="sort"></fa-icon>
-            </div>
-          </th>
-          <th scope="col" jhiSortBy="url">
-            <div class="d-flex">
-              <span jhiTranslate="streamingApp.film.url">Url</span>
-              <fa-icon class="p-1" icon="sort"></fa-icon>
-            </div>
-          </th>
-          <th scope="col"></th>
+    <p-table
+      *ngIf="films"
+      #dt2
+      [value]="films"
+      [globalFilterFields]="['name']"
+      responsiveLayout="scroll"
+      [(selection)]="selectedFilms"
+      [rowHover]="true"
+      [loading]="isLoading"
+      dataKey="id"
+    >
+      <ng-template pTemplate="caption">
+        <div class="flex align-items-center justify-content-between">
+          <h5 class="m-0">Manage Film</h5>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="header">
+        <tr>
+          <th>All</th>
+          <th>Title</th>
+          <th>Type</th>
+          <th>Gender</th>
+          <th></th>
         </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let film of films; trackBy: trackId" data-cy="entityTable">
+        <tr>
+          <th style="width: 3rem">
+            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+          </th>
+          <th>
+            <input class="filter" pInputText placeholder="Title..." type="text" (ngModelChange)="filterByTitle($event)" [(ngModel)]="titleFilter" />
+          </th>
+          <th>
+            <p-multiSelect [(ngModel)]="filmTypeFilter" [options]="filmTypeValues" placeholder="Any" (ngModelChange)="filterByFilmType()">
+              <ng-template let-option pTemplate="item">
+                <div class="p-multiselect-representative-option">
+                  <span class="ml-1">{{ option }}</span>
+                </div>
+              </ng-template>
+            </p-multiSelect>
+          </th>
+          <th>
+            <p-multiSelect [(ngModel)]="genderFilter" [options]="genderValues" placeholder="Any" (ngModelChange)="filterByGender()">
+              <ng-template let-option pTemplate="item">
+                <div class="p-multiselect-representative-option">
+                  <span class="ml-1">{{ option }}</span>
+                </div>
+              </ng-template>
+            </p-multiSelect>
+          </th>
+          <th>
+            <button pButton pRipple label="Clear" icon="pi pi-filter-slash" class="p-button-warning mr-2" (click)="clearFilters()"></button>
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-film>
+        <tr>
           <td>
-            <a [routerLink]="['/film', film.id, 'view']">{{ film.id }}</a>
+            <p-tableCheckbox [value]="film"></p-tableCheckbox>
           </td>
-          <td>{{ film.title }}</td>
-          <td>{{ film.synopsis }}</td>
-          <td>{{ film.views }}</td>
           <td>
-            <a *ngIf="film.cover" (click)="openFile(film.cover, film.coverContentType)">
-              <img [src]="'data:' + film.coverContentType + ';base64,' + film.cover" style="max-height: 30px" alt="film image" />
-            </a>
-            <span *ngIf="film.cover">{{ film.coverContentType }}, {{ byteSize(film.cover) }}</span>
+            {{ film.title }}
           </td>
-          <td>{{ film.reviews }}</td>
-          <td jhiTranslate="{{ 'streamingApp.Gender.' + film.gender }}">{{ film.gender }}</td>
-          <td jhiTranslate="{{ 'streamingApp.FilmType.' + film.filmType }}">{{ film.filmType }}</td>
-          <td>{{ film.order }}</td>
-          <td>{{ film.url }}</td>
-          <td class="text-end">
-            <div class="btn-group">
-              <button
-                type="submit"
-                [routerLink]="['/episode']"
-                [queryParams]="{ 'filter[filmId.in]': film.id }"
-                class="btn btn-info btn-sm"
-                data-cy="filterOtherEntityButton"
-              >
-                <fa-icon icon="eye"></fa-icon>
-                <span
-                  class="d-none d-md-inline"
-                  jhiTranslate="entity.action.show"
-                  [translateValues]="{ otherEntity: ('streamingApp.film.episodes' | translate) }"
-                  >Show Episode</span
-                >
-              </button>
-              <button type="submit" [routerLink]="['/film', film.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                <fa-icon icon="eye"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Vista</span>
-              </button>
-
-              <button type="submit" [routerLink]="['/film', film.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                <fa-icon icon="pencil-alt"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editar</span>
-              </button>
-
-              <button type="submit" (click)="delete(film)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                <fa-icon icon="times"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Eliminar</span>
-              </button>
-            </div>
+          <td>
+            {{ film.filmType }}
+          </td>
+          <td>
+            {{ film.gender }}
+          </td>
+          <td>
+            <button
+              pButton
+              pRipple
+              icon="pi pi-pencil"
+              class="p-button-rounded p-button-success mr-2"
+              [routerLink]="['/film', film.id, 'edit']"
+            ></button>
+            <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="delete(film)"></button>
           </td>
         </tr>
-      </tbody>
-    </table>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5">No customers found.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+    <br />
+    <div *ngIf="films && films.length > 0">
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems"
+          [page]="page"
+          [pageSize]="itemsPerPage"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        ></ngb-pagination>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *jhiHasAnyAuthority="'ROLE_USER'">
+  <div *ngIf="mostPopularFilms">
+    <h2><span jhiTranslate="streamingApp.film.home.mostPopular">Mas popular</span></h2>
+    <p-carousel [value]="mostPopularFilms" [circular]="true" [responsiveOptions]="responsiveOptions" [showIndicators]="false">
+      <ng-template let-film pTemplate="film">
+        <jhi-film-card [film]="film"></jhi-film-card>
+      </ng-template>
+    </p-carousel>
   </div>
 
-  <div *ngIf="films && films.length > 0">
-    <div class="d-flex justify-content-center">
-      <jhi-item-count [params]="{ page: page, totalItems: totalItems, itemsPerPage: itemsPerPage }"></jhi-item-count>
-    </div>
+  <div *ngIf="newFilms">
+    <h2><span jhiTranslate="streamingApp.film.home.news">Novedades</span></h2>
+    <p-carousel [value]="newFilms" [circular]="true" [responsiveOptions]="responsiveOptions" [showIndicators]="false">
+      <ng-template let-film pTemplate="film">
+        <jhi-film-card [film]="film"></jhi-film-card>
+      </ng-template>
+    </p-carousel>
+  </div>
 
-    <div class="d-flex justify-content-center">
-      <ngb-pagination
-        [collectionSize]="totalItems"
-        [page]="page"
-        [pageSize]="itemsPerPage"
-        [maxSize]="5"
-        [rotate]="true"
-        [boundaryLinks]="true"
-        (pageChange)="navigateToPage($event)"
-      ></ngb-pagination>
-    </div>
+  <div *ngIf="lastAddedFilms">
+    <h2><span jhiTranslate="streamingApp.film.home.lastAdded">Ultimas añadidas</span></h2>
+    <p-carousel [value]="lastAddedFilms" [circular]="true" [responsiveOptions]="responsiveOptions" [showIndicators]="false">
+      <ng-template let-film pTemplate="film">
+        <jhi-film-card [film]="film"></jhi-film-card>
+      </ng-template>
+    </p-carousel>
   </div>
 </div>
