@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -14,20 +14,35 @@ import { IPerson } from 'app/entities/person/person.model';
 import { PersonService } from 'app/entities/person/service/person.service';
 import { Gender } from 'app/entities/enumerations/gender.model';
 import { FilmType } from 'app/entities/enumerations/film-type.model';
+import { Dropdown } from 'primeng/dropdown';
+import { FileUpload } from 'primeng/fileupload';
 
 @Component({
   selector: 'jhi-film-update',
   templateUrl: './film-update.component.html',
+  styleUrls: ['./film-update.component.scss']
 })
-export class FilmUpdateComponent implements OnInit {
+export class FilmUpdateComponent implements OnInit, AfterViewInit, AfterViewChecked {
   isSaving = false;
   film: IFilm | null = null;
+
   genderValues = Object.keys(Gender);
+  selectedGender?: string;
+
   filmTypeValues = Object.keys(FilmType);
+  selectedFilmType?: string;
+
+  order?: number;
 
   peopleSharedCollection: IPerson[] = [];
+  selectedPeople: IPerson[] = [];
 
   editForm: FilmFormGroup = this.filmFormService.createFilmFormGroup();
+
+  fileUploadInit = true;
+
+  @ViewChild('genderDropdown') genderDropdown?: Dropdown;
+  @ViewChild('coverUpload') coverUpload?: FileUpload;
 
   constructor(
     protected dataUtils: DataUtils,
@@ -36,7 +51,8 @@ export class FilmUpdateComponent implements OnInit {
     protected filmFormService: FilmFormService,
     protected personService: PersonService,
     protected elementRef: ElementRef,
-    protected activatedRoute: ActivatedRoute
+    protected activatedRoute: ActivatedRoute,
+    private changeDetector: ChangeDetectorRef
   ) {}
 
   comparePerson = (o1: IPerson | null, o2: IPerson | null): boolean => this.personService.comparePerson(o1, o2);
@@ -52,6 +68,26 @@ export class FilmUpdateComponent implements OnInit {
     });
   }
 
+  ngAfterViewInit(): void {
+    if (this.genderDropdown) {
+      (this.genderDropdown.filterBy as any) = {
+        split: (_: any) => [(item: any) => item],
+      };
+    }
+
+
+    if (this.film && this.fileUploadInit) {
+      this.dataUtils.loadFileInFileUpload(this.film.cover!, this.film.coverContentType!, this.coverUpload).subscribe({
+        error: (err: FileLoadError) =>
+        this.eventManager.broadcast(new EventWithContent<AlertError>('streamingApp.error', { ...err, key: 'error.file.' + err.key })),
+      })
+    }
+  }
+
+  ngAfterViewChecked(): void {
+    this.changeDetector.detectChanges();
+  }
+
   byteSize(base64String: string): string {
     return this.dataUtils.byteSize(base64String);
   }
@@ -60,8 +96,9 @@ export class FilmUpdateComponent implements OnInit {
     this.dataUtils.openFile(base64String, contentType);
   }
 
-  setFileData(event: Event, field: string, isImage: boolean): void {
-    this.dataUtils.loadFileToForm(event, this.editForm, field, isImage).subscribe({
+  setFileData(event: any, field: string): void {
+    console.log(this.coverUpload);
+    this.dataUtils.loadFile(event, this.editForm, field).subscribe({
       error: (err: FileLoadError) =>
         this.eventManager.broadcast(new EventWithContent<AlertError>('streamingApp.error', { ...err, key: 'error.file.' + err.key })),
     });
@@ -114,10 +151,18 @@ export class FilmUpdateComponent implements OnInit {
     this.film = film;
     this.filmFormService.resetForm(this.editForm, film);
 
+    this.selectedGender = film.gender?.toString();
+    this.selectedFilmType = film.filmType?.toString();
+    this.order = film.order ?? 0;
+
     this.peopleSharedCollection = this.personService.addPersonToCollectionIfMissing<IPerson>(
       this.peopleSharedCollection,
       ...(film.people ?? [])
     );
+  }
+
+  protected selectedPerson(): void {
+    //
   }
 
   protected loadRelationshipsOptions(): void {
@@ -125,6 +170,15 @@ export class FilmUpdateComponent implements OnInit {
       .query()
       .pipe(map((res: HttpResponse<IPerson[]>) => res.body ?? []))
       .pipe(map((people: IPerson[]) => this.personService.addPersonToCollectionIfMissing<IPerson>(people, ...(this.film?.people ?? []))))
-      .subscribe((people: IPerson[]) => (this.peopleSharedCollection = people));
+      .subscribe((people: IPerson[]) => {
+        this.peopleSharedCollection = people;
+        this.film?.people?.forEach(selectedPerson => {
+          this.peopleSharedCollection.forEach(person => {
+            if (person.id === selectedPerson.id) {
+              this.selectedPeople.push(person);
+            }
+          });
+        });
+      });
   }
 }

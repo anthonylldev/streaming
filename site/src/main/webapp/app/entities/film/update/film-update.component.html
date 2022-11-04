@@ -1,179 +1,224 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
     <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2 id="jhi-film-heading" data-cy="FilmCreateUpdateHeading" jhiTranslate="streamingApp.film.home.createOrEditLabel">
-        Crear o editar Film
-      </h2>
+      <h2 *ngIf="film" id="jhi-film-heading" data-cy="FilmCreateUpdateHeading" jhiTranslate="streamingApp.film.home.edit">Editar film</h2>
 
+      <h2 *ngIf="!film" id="jhi-film-heading" data-cy="FilmCreateUpdateHeading" jhiTranslate="streamingApp.film.home.create">Crear film</h2>
+      <br />
       <div>
         <jhi-alert-error></jhi-alert-error>
 
-        <div class="row mb-3" *ngIf="editForm.controls.id.value !== null">
-          <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
-          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-        </div>
-
-        <div class="row mb-3">
-          <label class="form-label" jhiTranslate="streamingApp.film.title" for="field_title">Title</label>
-          <input type="text" class="form-control" name="title" id="field_title" data-cy="title" formControlName="title" />
-          <div *ngIf="editForm.get('title')!.invalid && (editForm.get('title')!.dirty || editForm.get('title')!.touched)">
-            <small class="form-text text-danger" *ngIf="editForm.get('title')?.errors?.required" jhiTranslate="entity.validation.required">
-              Este campo es obligatorio.
-            </small>
-            <small
-              class="form-text text-danger"
-              *ngIf="editForm.get('title')?.errors?.minlength"
-              jhiTranslate="entity.validation.minlength"
-              [translateValues]="{ min: 3 }"
-            >
-              Este campo requiere al menos 3 caracteres.
-            </small>
+        <div class="row mb-3 pl-2 d-flex justify-content-between">
+          <div class="col-md-5">
+            <div class="row">
+              <label class="form-label" jhiTranslate="streamingApp.film.title" for="field_title">Title</label>
+              <input type="text" pInputText class="form-control" name="title" id="field_title" data-cy="title" formControlName="title" />
+              <div *ngIf="editForm.get('title')!.invalid && (editForm.get('title')!.dirty || editForm.get('title')!.touched)">
+                <small
+                  class="form-text text-danger"
+                  *ngIf="editForm.get('title')?.errors?.required"
+                  jhiTranslate="entity.validation.required"
+                >
+                  Este campo es obligatorio.
+                </small>
+                <small
+                  class="form-text text-danger"
+                  *ngIf="editForm.get('title')?.errors?.minlength"
+                  jhiTranslate="entity.validation.minlength"
+                  [translateValues]="{ min: 3 }"
+                >
+                  Este campo requiere al menos 3 caracteres.
+                </small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-5">
+            <div class="row">
+              <label class="form-label" jhiTranslate="streamingApp.film.url" for="field_url">Url</label>
+              <input type="text" pInputText class="form-control" name="url" id="field_url" data-cy="url" formControlName="url" />
+              <div *ngIf="editForm.get('url')!.invalid && (editForm.get('url')!.dirty || editForm.get('url')!.touched)">
+                <small
+                  class="form-text text-danger"
+                  *ngIf="editForm.get('url')?.errors?.required"
+                  jhiTranslate="entity.validation.required"
+                >
+                  Este campo es obligatorio.
+                </small>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="row mb-3">
+        <div class="row mb-3 pl-2">
           <label class="form-label" jhiTranslate="streamingApp.film.synopsis" for="field_synopsis">Synopsis</label>
-          <input type="text" class="form-control" name="synopsis" id="field_synopsis" data-cy="synopsis" formControlName="synopsis" />
+          <textarea
+            [rows]="5"
+            [cols]="30"
+            pInputTextarea
+            [autoResize]="true"
+            class="form-control"
+            name="synopsis"
+            id="field_synopsis"
+            data-cy="synopsis"
+            formControlName="synopsis"
+          ></textarea>
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="streamingApp.film.views" for="field_views">Views</label>
-          <input type="number" class="form-control" name="views" id="field_views" data-cy="views" formControlName="views" />
-          <div *ngIf="editForm.get('views')!.invalid && (editForm.get('views')!.dirty || editForm.get('views')!.touched)">
-            <small
-              class="form-text text-danger"
-              *ngIf="editForm.get('views')?.errors?.min"
-              jhiTranslate="entity.validation.min"
-              [translateValues]="{ min: 0 }"
-            >
-              Este campo debe ser mayor que 0.
-            </small>
-            <small class="form-text text-danger" [hidden]="!editForm.get('views')?.errors?.number" jhiTranslate="entity.validation.number">
-              Este campo debe ser un número.
-            </small>
+          <div class="col-md-4">
+            <div class="row">
+              <label class="form-label" jhiTranslate="streamingApp.film.gender" for="field_gender">Gender</label>
+              <p-dropdown
+                #genderDropdown
+                [options]="genderValues"
+                [(ngModel)]="selectedGender"
+                [filter]="true"
+                [showClear]="true"
+                placeholder="Select a Gender"
+                formControlName="gender"
+                data-cy="gender"
+                name="gender"
+                id="field_gender"
+              >
+                <div>
+                  <input type="text" />
+                </div>
+                <ng-template pTemplate="selectedItem">
+                  <div class="gender-item gender-item-value" *ngIf="selectedGender">
+                    <div>{{ selectedGender }}</div>
+                  </div>
+                </ng-template>
+                <ng-template let-gender pTemplate="item">
+                  <div class="gender-item">
+                    <div>{{ gender }}</div>
+                  </div>
+                </ng-template>
+              </p-dropdown>
+            </div>
           </div>
+          <div class="col-md-4">
+            <div class="row">
+              <label class="form-label" jhiTranslate="streamingApp.film.filmType" for="field_filmType">Tilm type</label>
+              <p-dropdown
+                [options]="filmTypeValues"
+                [(ngModel)]="selectedFilmType"
+                [showClear]="true"
+                placeholder="Select a film type"
+                formControlName="filmType"
+                data-cy="filmType"
+                name="filmType"
+                id="field_filmType"
+              >
+                <div>
+                  <input type="text" />
+                </div>
+                <ng-template pTemplate="selectedItem">
+                  <div class="filmType-item filmType-item-value" *ngIf="selectedFilmType">
+                    <div>{{ selectedFilmType }}</div>
+                  </div>
+                </ng-template>
+                <ng-template let-filmType pTemplate="item">
+                  <div class="filmType-item">
+                    <div>{{ filmType }}</div>
+                  </div>
+                </ng-template>
+              </p-dropdown>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="row">
+              <label class="form-label" jhiTranslate="streamingApp.film.order" for="field_order">Order</label>
+              <p-inputNumber
+                [(ngModel)]="order"
+                [showButtons]="true"
+                [min]="0"
+                mode="decimal"
+                inputId="minmax-buttons"
+                placeholder="Select order"
+                formControlName="order"
+                data-cy="order"
+                name="order"
+                id="field_order"
+              >
+              </p-inputNumber>
+              <div *ngIf="editForm.get('order')!.invalid && (editForm.get('order')!.dirty || editForm.get('order')!.touched)">
+                <small
+                  class="form-text text-danger"
+                  *ngIf="editForm.get('order')?.errors?.min"
+                  jhiTranslate="entity.validation.min"
+                  [translateValues]="{ min: 0 }"
+                >
+                  Este campo debe ser mayor que 0.
+                </small>
+                <small
+                  class="form-text text-danger"
+                  [hidden]="!editForm.get('order')?.errors?.number"
+                  jhiTranslate="entity.validation.number"
+                >
+                  Este campo debe ser un número.
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="streamingApp.film.person" for="field_people">Person</label>
+          <p-multiSelect
+            [options]="peopleSharedCollection"
+            [(ngModel)]="selectedPeople"
+            display="chip"
+            placeholder="People..."
+            optionLabel="name"
+            formControlName="people"
+            data-cy="person"
+            name="people"
+            id="field_people"
+            (ngModelChange)="selectedPerson()"
+          >
+            <ng-template let-person pTemplate="item">
+              <div class="p-multiselect-representative-option">
+                <span class="ml-1">{{ person.name }}</span>
+              </div>
+            </ng-template>
+          </p-multiSelect>
         </div>
 
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="streamingApp.film.cover" for="field_cover">Cover</label>
-          <div>
-            <img
-              [src]="'data:' + editForm.get('coverContentType')!.value + ';base64,' + editForm.get('cover')!.value"
-              style="max-height: 100px"
-              *ngIf="editForm.get('cover')!.value"
-              alt="film image"
-            />
-            <div *ngIf="editForm.get('cover')!.value" class="form-text text-danger clearfix">
-              <span class="pull-start">{{ editForm.get('coverContentType')!.value }}, {{ byteSize(editForm.get('cover')!.value!) }}</span>
-              <button
-                type="button"
-                (click)="clearInputImage('cover', 'coverContentType', 'file_cover')"
-                class="btn btn-secondary btn-xs pull-end"
-              >
-                <fa-icon icon="times"></fa-icon>
-              </button>
-            </div>
-            <input
-              type="file"
-              id="file_cover"
-              data-cy="cover"
-              (change)="setFileData($event, 'cover', true)"
-              accept="image/*"
-              jhiTranslate="entity.action.addimage"
-            />
-          </div>
-          <input type="hidden" class="form-control" name="cover" id="field_cover" data-cy="cover" formControlName="cover" />
-          <input
-            type="hidden"
-            class="form-control"
-            name="coverContentType"
-            id="field_coverContentType"
-            formControlName="coverContentType"
-          />
-        </div>
-
-        <div class="row mb-3">
-          <label class="form-label" jhiTranslate="streamingApp.film.reviews" for="field_reviews">Reviews</label>
-          <input type="number" class="form-control" name="reviews" id="field_reviews" data-cy="reviews" formControlName="reviews" />
-        </div>
-
-        <div class="row mb-3">
-          <label class="form-label" jhiTranslate="streamingApp.film.gender" for="field_gender">Gender</label>
-          <select class="form-control" name="gender" formControlName="gender" id="field_gender" data-cy="gender">
-            <option [ngValue]="null">{{ 'streamingApp.Gender.null' | translate }}</option>
-            <option *ngFor="let gender of genderValues" [value]="gender">{{ 'streamingApp.Gender.' + gender | translate }}</option>
-          </select>
-        </div>
-
-        <div class="row mb-3">
-          <label class="form-label" jhiTranslate="streamingApp.film.filmType" for="field_filmType">Film Type</label>
-          <select class="form-control" name="filmType" formControlName="filmType" id="field_filmType" data-cy="filmType">
-            <option [ngValue]="null">{{ 'streamingApp.FilmType.null' | translate }}</option>
-            <option *ngFor="let filmType of filmTypeValues" [value]="filmType">
-              {{ 'streamingApp.FilmType.' + filmType | translate }}
-            </option>
-          </select>
-        </div>
-
-        <div class="row mb-3">
-          <label class="form-label" jhiTranslate="streamingApp.film.order" for="field_order">Order</label>
-          <input type="number" class="form-control" name="order" id="field_order" data-cy="order" formControlName="order" />
-          <div *ngIf="editForm.get('order')!.invalid && (editForm.get('order')!.dirty || editForm.get('order')!.touched)">
-            <small
-              class="form-text text-danger"
-              *ngIf="editForm.get('order')?.errors?.min"
-              jhiTranslate="entity.validation.min"
-              [translateValues]="{ min: 0 }"
-            >
-              Este campo debe ser mayor que 0.
-            </small>
-            <small class="form-text text-danger" [hidden]="!editForm.get('order')?.errors?.number" jhiTranslate="entity.validation.number">
-              Este campo debe ser un número.
-            </small>
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <label class="form-label" jhiTranslate="streamingApp.film.url" for="field_url">Url</label>
-          <input type="text" class="form-control" name="url" id="field_url" data-cy="url" formControlName="url" />
-          <div *ngIf="editForm.get('url')!.invalid && (editForm.get('url')!.dirty || editForm.get('url')!.touched)">
-            <small class="form-text text-danger" *ngIf="editForm.get('url')?.errors?.required" jhiTranslate="entity.validation.required">
-              Este campo es obligatorio.
-            </small>
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <label jhiTranslate="streamingApp.film.person" for="field_people">Person</label>
-          <select
-            class="form-control"
-            id="field_people"
-            data-cy="person"
-            multiple
-            name="people"
-            formControlName="people"
-            [compareWith]="comparePerson"
-          >
-            <option [ngValue]="personOption" *ngFor="let personOption of peopleSharedCollection">{{ personOption.id }}</option>
-          </select>
+          <p-fileUpload
+            #coverUpload
+            [auto]="true"
+            accept="image/*"
+            [customUpload]="true"
+            (uploadHandler)="setFileData($event, 'cover')"
+            data-cy="cover"
+            name="myfile[]"
+            id="file_cover"
+          ></p-fileUpload>
         </div>
       </div>
 
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancelar</span>
-        </button>
-
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving"
-          class="btn btn-primary"
-        >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Guardar</span>
-        </button>
-      </div>
+      <button
+        class="p-button-secondary"
+        pButton
+        type="button"
+        label="Cancel"
+        icon="pi pi-times"
+        (click)="previousState()"
+        id="cancel-save"
+        data-cy="entityCreateCancelButton"
+      ></button>
+      <button
+        class="p-button-success"
+        pButton
+        type="submit"
+        label="Save"
+        icon="pi pi-check"
+        [disabled]="editForm.invalid || isSaving"
+        id="save-entity"
+        data-cy="entityCreateSaveButton"
+      ></button>
     </form>
   </div>
 </div>
