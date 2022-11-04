@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { FileUpload } from 'primeng/fileupload';
 import { Observable, Observer } from 'rxjs';
 
-export type FileLoadErrorType = 'not.image' | 'could.not.extract';
+export type FileLoadErrorType = 'not.image' | 'could.not.extract' | 'not.file.upload';
 
 export interface FileLoadError {
   message: string;
@@ -89,6 +90,81 @@ export class DataUtils {
         observer.error(error);
       }
     });
+  }
+
+  loadFile(event: any, editForm: FormGroup, field: string): Observable<void> {
+    return new Observable((observer: Observer<void>) => {
+      const fieldContentType: string = field + 'ContentType';
+      const file = event.files[0];
+      if (file) {
+        this.toBase64(file, (base64Data: string) => {
+          editForm.patchValue({
+            [field]: base64Data,
+            [fieldContentType]: file.type,
+          });
+          observer.next();
+          observer.complete();
+        });
+      } else {
+        const error: FileLoadError = {
+          message: 'Could not extract file',
+          key: 'could.not.extract',
+          params: { event },
+        };
+        observer.error(error);
+      }
+    });
+  }
+
+  loadFileInFileUpload(cover: string, coverContentType: string, fileUpload?: FileUpload): Observable<void> {
+    return new Observable((observer: Observer<void>) => {
+      if (fileUpload) {
+        fileUpload.clear();
+        if (cover && coverContentType) {
+          const file = this.toFile(cover, coverContentType);
+          fileUpload.files.push(file);
+          observer.next();
+          observer.complete();
+        } else {
+          const error: FileLoadError = {
+            message: 'Image not found',
+            key: 'not.image',
+            params: { fileUpload },
+          };
+          observer.error(error);
+        }
+      } else {
+        const error: FileLoadError = {
+          message: 'File upload not found',
+          key: 'not.file.upload',
+          params: { fileUpload },
+        };
+        observer.error(error);
+      }
+    });
+  }
+
+  /**
+   * Method to convert the base64 to file
+   *
+   * TODO set objectUrl to file
+   */
+  private toFile(base64: string, coverContentType: string): File {
+    const byteString = window.atob(base64);
+    const arrayBuffer = new ArrayBuffer(byteString.length);
+    const int8Array = new Uint8Array(arrayBuffer);
+
+    for (let i = 0; i < byteString.length; i++) {
+      int8Array[i] = byteString.charCodeAt(i);
+    }
+
+    const blob = new Blob([int8Array], { type: coverContentType });
+
+    // URL.createObjectURL(blob)
+
+    const file = new File([blob], coverContentType, {type: coverContentType });
+
+    return file;
   }
 
   /**
