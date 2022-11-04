@@ -1,0 +1,11 @@
+:host ::ng-deep {
+  .p-dropdown, .p-inputnumber, .p-multiselect {
+    width: 100%;
+  }
+}
+
+h2 {
+  font-weight: bold;
+  font-size: 2em;
+  text-align: center;
+}

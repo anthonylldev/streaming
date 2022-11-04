@@ -15,6 +15,10 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { DropdownModule } from 'primeng/dropdown';
+import {InputTextareaModule} from 'primeng/inputtextarea';
+import {InputNumberModule} from 'primeng/inputnumber';
+import {FileUploadModule} from 'primeng/fileupload';
+
 
 @NgModule({
   imports: [
@@ -29,6 +33,9 @@ import { DropdownModule } from 'primeng/dropdown';
     InputTextModule,
     MultiSelectModule,
     DropdownModule,
+    InputTextareaModule,
+    InputNumberModule,
+    FileUploadModule
   ],
   declarations: [FilmComponent, FilmDetailComponent, FilmUpdateComponent, FilmDeleteDialogComponent, FilmCardComponent],
 })
